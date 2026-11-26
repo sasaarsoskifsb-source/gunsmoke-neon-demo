@@ -23,7 +23,7 @@ $('#ar-roll').addEventListener('click',roll);tray.addEventListener('click',roll)
 
 /* ---------- AR ---------- */
 const stage=$('#ar-stage'),statusEl=$('#ar-status');
-const st={src:null,srcW:0,srcH:0,pose:null,lost:0,model:'outlaw',h:90,rot:0,f:.75,grid:true,manual:null,video:null,corners:null,on:false,inited:false};
+const st={src:null,srcW:0,srcH:0,pose:null,lost:0,model:GN.store.get('char','outlaw'),h:90,rot:0,f:.75,grid:true,manual:null,video:null,corners:null,on:false,inited:false};
 function say(t,cls){statusEl.hidden=false;statusEl.textContent=t;statusEl.className=cls||'';}
 let renderer,scene,cam,paper,hex,shadow,baseRing,pivot,loader,current=null,autoYaw=null,disp={},dc,dctx,cache={},lastDet=0,smooth=null,raf=0;
 function init(){
@@ -46,16 +46,20 @@ function init(){
   dc=document.createElement('canvas');dctx=dc.getContext('2d',{willReadFrequently:true});
   new ResizeObserver(layout).observe(stage);bindInput();loadModel(st.model);return true;
 }
+function renderPick(){const el=$('#ar-pick');el.innerHTML=GN.chars.list().map(c=>`<button data-m="${GN.esc(c.id)}" class="${c.id===st.model?'on-t':''}" aria-pressed="${c.id===st.model}">${GN.esc(c.name)}</button>`).join('');}
+GN.chars.on(renderPick);
 function loadModel(k){
-  st.model=k;[...$('#ar-pick').children].forEach(b=>b.classList.toggle('on-t',b.dataset.m===k));
+  if(!GN.chars.get(k))k='outlaw';st.model=k;renderPick();
   if(!renderer)return;
   const use=g=>{if(st.model!==k)return;if(current)pivot.remove(current);current=g;pivot.add(g);fit();};
   if(cache[k]){use(cache[k]);return;}
-  if(!(window.GN_EMBED&&GN_EMBED[k])){say('Loading miniature…','warn');const sc=document.createElement('script');sc.src='m-'+k+'.js';sc.onload=()=>loadModel(st.model);sc.onerror=()=>say('Miniature failed to load.','warn');document.head.appendChild(sc);return;}
-  loader.load('data:model/gltf-binary;base64,'+GN_EMBED[k],gl=>{const o=new THREE.Group(),m=gl.scene;m.rotation.x=Math.PI/2;o.add(m);o.updateMatrixWorld(true);
-    const b=new THREE.Box3().setFromObject(m),c=b.getCenter(new THREE.Vector3());m.position.set(-c.x,-c.y,-b.min.z);
-    o.userData.h=b.max.z-b.min.z;o.userData.r=Math.max(b.max.x-b.min.x,b.max.y-b.min.y)/2;cache[k]=o;use(o);
-    say(st.pose?'Sheet found':(st.src?'Looking for a white A4 sheet…':'Miniature ready. Show the sheet.'),st.pose?'ok':'warn');},undefined,()=>say('Miniature failed to load.','warn'));
+  say('Loading miniature…','warn');
+  GN.chars.buffer(k).then(GN.chars.parse).then(sc=>{
+    GN.chars.normalise(sc);const m=new THREE.Group();m.add(sc);m.rotation.x=Math.PI/2;const o=new THREE.Group();o.add(m);o.updateMatrixWorld(true);
+    const b=new THREE.Box3().setFromObject(m);o.userData.h=b.max.z-b.min.z||1.9;
+    o.userData.r=.35;
+    cache[k]=o;use(o);say(st.pose?'Sheet found':(st.src?'Looking for a white A4 sheet…':'Miniature ready. Show the sheet.'),st.pose?'ok':'warn');
+  }).catch(()=>say('Miniature failed to load.','warn'));
 }
 function fit(){if(!current)return;const s=st.h/current.userData.h;current.scale.setScalar(s);const r=current.userData.r*s*1.05;shadow.scale.setScalar(r);baseRing.scale.setScalar(r*1.02);}
 function applyPose(p){
@@ -132,6 +136,7 @@ $('#ar-fov').addEventListener('input',e=>{st.f=e.target.value/100;$('#ar-fv').te
 $('#ar-grid').addEventListener('click',e=>{st.grid=!st.grid;if(hex)hex.visible=st.grid;e.currentTarget.classList.toggle('on-t',st.grid);});
 $('#ar-face').addEventListener('click',()=>{autoYaw=null;st.rot=0;$('#ar-rot').value=0;$('#ar-rv').textContent='0°';if(st.pose)applyPose(st.pose);});
 function loop(t){if(!st.on)return;liveStep(t);renderer.render(scene,cam);raf=requestAnimationFrame(loop);}
+renderPick();
 GN.register('ar',{show(){if(!st.inited&&!init())return;if(!renderer)return;st.on=true;layout();raf=requestAnimationFrame(loop);
   if(!framed&&camOK&&!st.video&&!st.src&&navigator.permissions)navigator.permissions.query({name:'camera'}).then(p=>{if(p.state==='granted'&&st.on&&!st.video)startCam();}).catch(()=>{});},hide(){st.on=false;cancelAnimationFrame(raf);stopVideo();}});
 })();

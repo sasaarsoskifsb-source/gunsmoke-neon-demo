@@ -25,13 +25,15 @@ const SLOTS=[
   {id:'none',n:'Empty holsters',d:'Udarac only: 1D6',r:'common'},
   {id:'revolvers',n:'Twin Revolvers',d:'Revolver 3D6 · range 1–6',r:'common'},
   {id:'shotgun',n:'Sawn-off Shotgun',d:'Shotgun 3D6 · range 1–3',r:'rare'},
-  {id:'knives',n:'Throwing Knives',d:'Planned weapon',r:'rare'}]},
+  {id:'knives',n:'Throwing Knives',d:'Consumable · 1D6',r:'common'},
+  {id:'smg',n:'Viper SMG',d:'SMG 4D6 · range 1–4',r:'rare'}]},
  {id:'back',name:'Back',desc:'Big gear on the back.',cam:'back',items:[
   {id:'none',n:'Nothing',d:'',r:'common'},
   {id:'jetpack',n:'Jet Boost Pack',d:'Upgrade: move +1',r:'epic'},
   {id:'katana',n:'Sheathed Katana',d:'Katana 2D6 · range 1',r:'rare'},
   {id:'rifle',n:'Sniper Rifle',d:'Snajper 2D6 · range 4–8',r:'rare'},
-  {id:'datapack',n:'Data Pack',d:'Hacking rig',r:'common'}]},
+  {id:'datapack',n:'Data Pack',d:'Hacking rig',r:'common'},
+  {id:'rocket',n:'Hellfire Launcher',d:'Rocket 1D6 · blast 3',r:'epic'}]},
  {id:'shoulder',name:'Shoulder',desc:'Armor on the left shoulder.',cam:'full',items:[
   {id:'none',n:'Nothing',d:'',r:'common'},
   {id:'pauldron',n:'Rust Pauldron',d:'Subdermal armor look',r:'common'},
@@ -89,8 +91,8 @@ const mesh=(g,m,p,r)=>{const o=new THREE.Mesh(g,m);if(p)o.position.set(...p);if(
 const CHARS={
  outlaw:{name:'Pistolwhisker',cls:'Gunslinger',head:[.05,1.74,0],hatY:1.8,face:[.1,1.75,.12],backC:[.0,1.22,-.2],hipL:[-.21,.97,.04],hipR:[.21,.97,.04],shL:[-.22,1.41,-.01],belt:[.02,1.0,.02,1.1,.95],halo:2.02,spine:[0,1.5,-.19]},
  vigilante:{name:'Vigilante',cls:'Gunslinger',head:[.07,1.69,-.03],hatY:1.8,face:[.11,1.72,.1],backC:[.06,1.28,-.3],hipL:[-.18,.97,0],hipR:[.38,.97,0],shL:[.3,1.44,0],belt:[.12,1.0,-.02,1.45,1.05],halo:2.04,spine:[.06,1.55,-.27]}};
-let charId=GN.store.get('char','outlaw');if(!CHARS[charId])charId='outlaw';
-let A=CHARS[charId];
+let charId=GN.store.get('char','outlaw');if(!GN.chars.get(charId))charId='outlaw';
+let A=CHARS[charId]||CHARS.outlaw;
 function build(slot,id){
   const g=new THREE.Group();
   if(slot==='head'){
@@ -109,6 +111,7 @@ function build(slot,id){
     const holster=(x,side)=>{const h=new THREE.Group();h.add(mesh(new THREE.BoxGeometry(.06,.16,.05),M(COL.leather,{roughness:.8})));h.add(mesh(new THREE.BoxGeometry(.035,.09,.03),M(COL.wood),[0,.11,-.01],[.3,0,0]));h.add(mesh(new THREE.CylinderGeometry(.018,.018,.03,12),M(COL.steel,{metalness:.9,roughness:.3}),[0,.06,.01],[Math.PI/2,0,0]));h.position.set(x,0,0);h.rotation.z=side*.12;return h;};
     if(id==='revolvers'){g.add(holster(A.hipL[0]-.02,1));g.add(holster(A.hipR[0]+.02,-1));}
     if(id==='shotgun'){const s=new THREE.Group();s.add(mesh(new THREE.BoxGeometry(.05,.42,.05),M(COL.steel,{metalness:.8,roughness:.35}),[0,-.05,0]));s.add(mesh(new THREE.BoxGeometry(.06,.16,.07),M(COL.wood),[0,.2,-.01]));s.position.set(A.hipR[0]+.04,0,0);s.rotation.z=-.15;g.add(s);}
+    if(id==='smg'){const s=new THREE.Group();s.add(mesh(new THREE.BoxGeometry(.05,.1,.24),M(COL.steel,{metalness:.8,roughness:.35})));s.add(mesh(new THREE.BoxGeometry(.035,.12,.04),M(COL.ink),[0,-.08,.02]));s.add(mesh(new THREE.BoxGeometry(.052,.012,.18),GLOW(COL.teal),[0,.056,0]));s.position.set(A.hipR[0]+.05,-.02,.04);s.rotation.x=.25;g.add(s);}
     if(id==='knives')for(let i=0;i<3;i++){g.add(mesh(new THREE.BoxGeometry(.012,.14,.03),M(COL.steel,{metalness:.9,roughness:.2}),[A.hipL[0]-.02,-.05,.02+i*.035],[0,0,.1]));g.add(mesh(new THREE.BoxGeometry(.016,.05,.032),M(COL.rust),[A.hipL[0]-.022,.04,.02+i*.035]));}
     g.position.y=A.hipL[1];g.position.z=A.hipL[2];
   }
@@ -116,6 +119,7 @@ function build(slot,id){
     if(id==='jetpack'){for(const s of[-1,1]){g.add(mesh(new THREE.CylinderGeometry(.06,.06,.3,20),M(COL.steel,{metalness:.85,roughness:.3}),[s*.075,0,0]));g.add(mesh(new THREE.ConeGeometry(.05,.08,20),GLOW(COL.teal),[s*.075,-.19,0],[Math.PI,0,0]));g.add(mesh(new THREE.TorusGeometry(.061,.008,8,24),M(COL.rust),[s*.075,.1,0],[Math.PI/2,0,0]));}g.add(mesh(new THREE.BoxGeometry(.2,.18,.06),M(COL.ink),[0,.02,.05]));g.position.set(A.backC[0],A.backC[1],A.backC[2]-.06);}
     if(id==='katana'){g.add(mesh(new THREE.BoxGeometry(.035,.85,.025),M(COL.ink,{roughness:.4})));g.add(mesh(new THREE.CylinderGeometry(.04,.04,.012,20),M(COL.gold,{metalness:.9}),[0,.43,0]));g.add(mesh(new THREE.BoxGeometry(.03,.2,.022),M(COL.rust),[0,.54,0]));g.add(mesh(new THREE.BoxGeometry(.006,.83,.03),GLOW(COL.mag),[.018,0,0]));g.position.set(A.backC[0],A.backC[1]+.05,A.backC[2]-.04);g.rotation.z=.65;}
     if(id==='rifle'){g.add(mesh(new THREE.BoxGeometry(.045,.95,.05),M(COL.steel,{metalness:.8,roughness:.35})));g.add(mesh(new THREE.BoxGeometry(.06,.28,.07),M(COL.wood),[0,-.38,0]));g.add(mesh(new THREE.CylinderGeometry(.022,.022,.2,16),M(COL.ink),[0,.12,-.05]));g.add(mesh(new THREE.CircleGeometry(.02,16),GLOW(COL.teal),[0,.22,-.05],[-Math.PI/2,0,0]));g.position.set(A.backC[0],A.backC[1]+.05,A.backC[2]-.05);g.rotation.z=-.6;}
+    if(id==='rocket'){g.add(mesh(new THREE.CylinderGeometry(.065,.065,.95,24),M(0x3a3f2f,{roughness:.6})));g.add(mesh(new THREE.CylinderGeometry(.075,.075,.06,24),GLOW(COL.mag),[0,.3,0]));g.add(mesh(new THREE.CylinderGeometry(.075,.05,.1,24),M(COL.steel,{metalness:.8}),[0,.5,0]));g.add(mesh(new THREE.BoxGeometry(.05,.14,.06),M(COL.ink),[0,-.05,.07]));g.position.set(A.backC[0],A.backC[1]+.05,A.backC[2]-.07);g.rotation.z=.55;}
     if(id==='datapack'){g.add(mesh(new THREE.BoxGeometry(.28,.32,.12),M(COL.ink,{roughness:.5})));g.add(mesh(new THREE.BoxGeometry(.2,.02,.005),GLOW(COL.teal),[0,.06,-.062]));g.add(mesh(new THREE.BoxGeometry(.2,.02,.005),GLOW(COL.teal),[0,0,-.062]));g.add(mesh(new THREE.BoxGeometry(.08,.08,.03),M(COL.rust),[0,-.09,-.07]));g.position.set(A.backC[0],A.backC[1],A.backC[2]-.07);}
   }
   if(slot==='shoulder'&&id!=='none'){
@@ -142,7 +146,7 @@ const TINT={orig:0xffffff,bone:0xf6ead0,rust:0xf0a585,ink:0x8f9cad,chrome:0xb4ff
 apply=function(){
   if(!model)return;
   for(const s of SLOTS){if(parts[s.id])rig.remove(parts[s.id]);if(s.id==='outfit')continue;parts[s.id]=build(s.id,cur[s.id]);rig.add(parts[s.id]);}
-  for(const m of mats){m.color.setHex(TINT[cur.outfit]);m.emissive.setHex(cur.outfit==='chrome'?0x003833:0);m.metalness=cur.outfit==='chrome'?.55:m.userData.met;}
+  for(const m of mats){if(m.color)m.color.setHex(TINT[cur.outfit]);if(m.emissive)m.emissive.setHex(cur.outfit==='chrome'?0x003833:0);if('metalness' in m)m.metalness=cur.outfit==='chrome'?.55:m.userData.met;}
 }
 /* ---------- kamera ---------- */
 let yaw=0,tYaw=0,pitch=.12,dist=5.2,tDist=5.2,lookY=.95,tLookY=.95,spin=true;
@@ -163,16 +167,20 @@ cv.addEventListener('wheel',e=>{e.preventDefault();tDist=Math.max(1.6,Math.min(8
 new ResizeObserver(()=>{const w=view.clientWidth,h=view.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}).observe(view);
 /* ---------- model ---------- */
 const loader=new THREE.GLTFLoader();
-const scenes={};
+const scenes={},anc={};
 function load(){
-  const id=charId;
-  if(!window.GN_EMBED||!GN_EMBED[id]){const sc=document.createElement('script');sc.src='m-'+id+'.js';sc.onload=load;sc.onerror=()=>{const l=$('#lo-load');if(l)l.textContent='Miniature failed to load.';};document.head.appendChild(sc);return;}
-  const use=sc=>{if(id!==charId)return;if(model)rig.remove(model);model=sc;mats=[];model.traverse(n=>{if(n.isMesh){const m=n.material;if(m.userData.met===undefined)m.userData.met=m.metalness;mats.push(m);}});
-    rig.add(model);const l=$('#lo-load');if(l)l.remove();apply();};
+  const id=charId;const l0=$('#lo-load');
+  const use=sc=>{if(id!==charId)return;A=anc[id];if(model)rig.remove(model);model=sc;mats=[];
+    model.traverse(n=>{if(n.isMesh){(Array.isArray(n.material)?n.material:[n.material]).forEach(m=>{if(!m)return;if(m.userData.met===undefined)m.userData.met=m.metalness;mats.push(m);});}});
+    rig.add(model);const l=$('#lo-load');if(l)l.hidden=true;apply();};
   if(scenes[id]){use(scenes[id]);return;}
-  loader.load('data:model/gltf-binary;base64,'+GN_EMBED[id],gl=>{scenes[id]=gl.scene;use(gl.scene);},undefined,()=>{const l=$('#lo-load');if(l)l.textContent='Miniature failed to load.';});
+  if(l0){l0.hidden=false;l0.textContent='Loading miniature…';}
+  GN.chars.buffer(id).then(GN.chars.parse).then(sc=>{
+    if(CHARS[id])anc[id]=CHARS[id];else{GN.chars.normalise(sc);const w=new THREE.Group();w.add(sc);anc[id]=GN.chars.anchors(w);sc=w;}
+    scenes[id]=sc;use(sc);
+  }).catch(()=>{const l=$('#lo-load');if(l){l.hidden=false;l.textContent='This character could not be loaded.';}});
 }
-GN.loChar=id=>{if(!CHARS[id]||id===charId)return;charId=id;A=CHARS[id];GN.store.set('char',id);load();};
+GN.loChar=id=>{if(!GN.chars.get(id)||id===charId)return;charId=id;GN.store.set('char',id);load();};
 load();
 let t0=performance.now();
 function loop(t){
@@ -186,9 +194,36 @@ function loop(t){
 GN.loStart=()=>{t0=performance.now();requestAnimationFrame(loop);};GN.loStart();
 }
 
-function renderChars(){const el=$('#lo-chars');if(!el)return;el.innerHTML=Object.entries({outlaw:'Pistolwhisker',vigilante:'Vigilante'}).map(([k,n])=>`<button data-c="${k}" class="${k===GN.store.get('char','outlaw')?'on-t':''}" aria-pressed="${k===GN.store.get('char','outlaw')}">${n}</button>`).join('');}
-renderChars();
-$('#lo-chars').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;GN.store.set('char',b.dataset.c);renderChars();if(GN.loChar)GN.loChar(b.dataset.c);});
+const CLS={gunslinger:'Gunslinger',brawler:'Brawler',tech:'Tech-Slinger',ghost:'Ghost',sniper:'Sniper'};
+function renderChars(){const el=$('#lo-chars');if(!el)return;const sel=GN.store.get('char','outlaw');
+  el.innerHTML=GN.chars.list().map(c=>`<button data-c="${GN.esc(c.id)}" class="${c.id===sel?'on-t':''}" aria-pressed="${c.id===sel}">${GN.esc(c.name)}${c.builtin?'':' ★'}</button>`).join('')+'<button class="b-gold" data-up="1">+ Upload</button>';
+  const c=GN.chars.get(sel);const d=$('#lo-del');if(d)d.hidden=!c||c.builtin;}
+GN.chars.on(renderChars);renderChars();
+$('#lo-chars').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.up){uploadDialog();return;}
+  GN.store.set('char',b.dataset.c);renderChars();if(GN.loChar)GN.loChar(b.dataset.c);});
+function uploadDialog(){
+  GN.modal(`<h2 id="md-t" class="cond" style="color:var(--gold)">Upload your character</h2>
+  <p class="sub" style="margin:0">A .glb file (binary glTF 2.0), standing upright and facing forward (+Z), up to ${GN.chars.MAXMB} MB. Best on phones: under 60k triangles and 2K textures. It stays on this device.</p>
+  <label class="btn filebtn" style="width:100%">Choose .glb file<input id="up-f" type="file" accept=".glb,model/gltf-binary"></label>
+  <span class="sub" id="up-n">No file chosen</span>
+  <label class="r">Name <input id="up-name" maxlength="32" style="flex:1;min-height:42px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--bone);padding:0 10px;font:inherit"></label>
+  <label class="r">Class <select id="up-cls">${Object.entries(CLS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label>
+  <p class="sub" id="up-err" style="margin:0;color:var(--magl)"></p>
+  <div class="g2"><button data-close>Cancel</button><button class="b-gold" id="up-ok" disabled>Add character</button></div>`,(c,close)=>{
+    const f=c.querySelector('#up-f'),ok=c.querySelector('#up-ok');let file=null;
+    f.addEventListener('change',()=>{file=f.files[0]||null;c.querySelector('#up-n').textContent=file?`${file.name} · ${(file.size/1e6).toFixed(1)} MB`:'No file chosen';if(file&&!c.querySelector('#up-name').value)c.querySelector('#up-name').value=file.name.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').slice(0,32);ok.disabled=!file;});
+    ok.addEventListener('click',async()=>{ok.disabled=true;ok.textContent='Adding…';c.querySelector('#up-err').textContent='';
+      try{const r=await GN.chars.add(file,c.querySelector('#up-name').value.trim(),c.querySelector('#up-cls').value);
+        close();GN.store.set('char',r.id);renderChars();if(GN.loChar)GN.loChar(r.id);
+        GN.toast(r.saved?'Character added and saved on this device.':'Character added for this visit (this browser blocks saving).');
+        if(file.size>15e6)setTimeout(()=>GN.toast('Heavy model: it may be slow on phones. Aim for under 60k triangles.'),3000);
+      }catch(err){c.querySelector('#up-err').textContent=err.message||'Upload failed.';ok.disabled=false;ok.textContent='Add character';}});
+  });
+}
+$('#lo-del').addEventListener('click',()=>{const id=GN.store.get('char','outlaw'),c=GN.chars.get(id);if(!c||c.builtin)return;
+  GN.modal(`<h2 id="md-t" class="cond" style="color:var(--gold)">Remove ${GN.esc(c.name)}?</h2><p class="sub" style="margin:0">The uploaded file is deleted from this device. Built-in miniatures stay.</p><div class="g2"><button data-close>Keep</button><button class="b-gold" id="del-ok">Remove</button></div>`,(m,close)=>{
+    m.querySelector('#del-ok').addEventListener('click',async()=>{await GN.chars.remove(id);close();GN.store.set('char','outlaw');renderChars();if(GN.loChar)GN.loChar('outlaw');GN.toast(`${c.name} removed.`);});});});
 GN.loadoutSet=(slotId,id)=>{cur[slotId]=id;try{localStorage.setItem('gn-loadout',JSON.stringify(cur));}catch(e){}renderUI();apply();};
 GN.register('loadout',{show(){visible=true;if(!started)init3d();else if(GN.loStart)GN.loStart();},hide(){visible=false;}});
 }

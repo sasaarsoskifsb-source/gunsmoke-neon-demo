@@ -36,57 +36,63 @@ $('#v-home').addEventListener('click',e=>{const b=e.target.closest('[data-act]')
       const a=c.querySelector('#bt-a');a.addEventListener('input',()=>c.querySelector('#bt-v').textContent=a.value+' cr');
       c.querySelector('#bt-ok').addEventListener('click',()=>{const n=+a.value,who=c.querySelector('#bt-who').value;if(n>st.cr){toast('Not enough credits.');return;}setCr(st.cr-n);close();toast(`Bounty of ${n} cr posted on ${who}.`);});});
 });
-register('home');
 
-/* ---------- GEAR ---------- */
-const IC={gun:'<path d="M3 9h14l2-2h2v4h-4l-1 2h-3l-1 4H8l1-4H3z"/>',blade:'<path d="M5 19L18 6l1-3 2 2-3 1L5 19l-1 2-2-2z"/>',chip:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>',flask:'<path d="M9 2h6M10 2v5l-5 9a3 3 0 0 0 3 4h8a3 3 0 0 0 3-4l-5-9V2"/>',shield:'<path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/>'};
-const RC={common:'#b5a7b4',rare:'#32d6d0',epic:'#ff8f8d',legendary:'#c6a15b'};
-const ITEMS=[
- {id:'revolver',n:'Revolver',t:'weapon',r:'common',ic:'gun',s:'3D6 · range 1–6',d:'Hit on 4+ (5+ at 5–6 hexes), damage 1. Fires on the sprint with 1D6.',p:6,lo:['weapon','revolvers']},
- {id:'heavyrev',n:'Heavy Revolver',t:'weapon',r:'rare',ic:'gun',s:'3D6 · dmg 2',d:'Range 1–4, hit on 5+, damage 2. Planned weapon from the design notes.',p:14,lo:['weapon','revolvers']},
- {id:'shotgun',n:'Sawn-off Shotgun',t:'weapon',r:'rare',ic:'gun',s:'3D6 · range 1–3',d:'Hit on 4+ (5+ at 3 hexes). Damage 2 at 1 hex, else 1.',p:10,lo:['weapon','shotgun']},
- {id:'katana',n:'Katana',t:'weapon',r:'rare',ic:'blade',s:'2D6 · hit 3+',d:'Range 1, damage 2. Dodge a firearm hit on a 6 and the shooter takes 1.',p:10,lo:['back','katana']},
- {id:'ekatana',n:'Energy Katana',t:'weapon',r:'epic',ic:'blade',s:'Deflects on 5+',d:'Katana that deflects on a 5 or 6. Planned weapon.',p:20,lo:['back','katana']},
- {id:'sniper',n:'Sniper Rifle',t:'weapon',r:'rare',ic:'gun',s:'2D6 · range 4–8',d:'Damage 2. Aimed (no move this turn) hits on 3+.',p:12,lo:['back','rifle']},
- {id:'emp',n:'EMP Rifle',t:'weapon',r:'epic',ic:'gun',s:'Disables drones',d:'Hit drones and upgrades are off until the end of next round. Planned weapon.',p:18,lo:['back','rifle']},
- {id:'knives',n:'Throwing Knives',t:'weapon',r:'common',ic:'blade',s:'1D6 · range 1–3',d:'One knife per throw. Planned weapon.',p:2,lo:['weapon','knives']},
- {id:'granate',n:'Granate',t:'consumable',r:'rare',ic:'flask',s:'Blast 1 hex',d:'Thrown up to 3 hexes. Hits everyone on and next to the target hex.',p:4},
- {id:'cyberreflex',n:'Cyber-Reflex',t:'cyberware',r:'rare',ic:'chip',s:'Dodge 2D6',d:'Roll 2D6 to dodge, keep the better die.',p:10},
- {id:'jetboost',n:'Jet Boost',t:'cyberware',r:'epic',ic:'chip',s:'Move +1',d:'Movement +1 and sprint +1.',p:6,lo:['back','jetpack']},
- {id:'cybereyes',n:'Cyber Eyes',t:'cyberware',r:'rare',ic:'chip',s:'Aim after move',d:'Sniper can aim after moving 1 hex.',p:6,lo:['cyber','eye']},
- {id:'neural',n:'Neural Prediction',t:'cyberware',r:'epic',ic:'chip',s:'Reroll 1 die',d:'Once per round, reroll one of your dice.',p:14,lo:['cyber','spine']},
- {id:'nanoheal',n:'Nano Heal',t:'consumable',r:'common',ic:'flask',s:'+3 HP',d:'Action: heal 3 HP. Single use.',p:3},
- {id:'plasma',n:'Plasma Shield',t:'cyberware',r:'legendary',ic:'shield',s:'Cancel 2 hits',d:'Reaction, once per round: cancel up to 2 hits from one attack.',p:24,lo:['shoulder','shield']},
- {id:'camo',n:'Adaptive Camo',t:'cyberware',r:'epic',ic:'shield',s:'+1 dodge in cover',d:'Extra +1 to dodge while in cover.',p:12},
- {id:'aicore',n:'AI Core Shard',t:'loot',r:'legendary',ic:'chip',s:'Story loot',d:'Piece of the lost Corporation AI core. Wanted by two factions.',p:40}];
-const byId=id=>ITEMS.find(i=>i.id===id);
-let gFilter='all',gSel='plasma';
-const CATS=[['all','All'],['weapon','Weapons'],['cyberware','Cyberware'],['consumable','Consumables'],['loot','Loot']];
-function renderGear(){
-  const sl=[['Weapon',st.weapon],['Upgrade 1',st.up[0]],['Upgrade 2',st.up[1]],['Upgrade 3',st.up[2]]];
-  $('#g-slots').innerHTML=sl.map(([l,id])=>{const i=id&&byId(id);return `<div style="${i?'border-color:'+RC[i.r]:'border-style:dashed;color:var(--mute)'}"><div class="sub" style="font-size:12px">${l}</div><b style="font-size:14px">${i?esc(i.n):'Empty'}</b></div>`;}).join('');
-  $('#g-chips').innerHTML=CATS.map(([k,l])=>`<button data-f="${k}" class="${gFilter===k?'on-t':''}" aria-pressed="${gFilter===k}">${l}${k==='all'?' '+ITEMS.length:''}</button>`).join('');
-  $('#g-items').innerHTML=ITEMS.filter(i=>gFilter==='all'||i.t===gFilter).map(i=>{const q=st.items[i.id];const eq=st.weapon===i.id||st.up.includes(i.id);
-    return `<button class="it r-${i.r} ${gSel===i.id?'sel':''}" data-i="${i.id}" aria-pressed="${gSel===i.id}" style="${gSel===i.id?'border-color:'+RC[i.r]:''}"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="${RC[i.r]}" stroke-width="1.8" stroke-linejoin="round">${IC[i.ic]}</svg><b>${esc(i.n)}</b><small>${eq?'Equipped':esc(i.s)}</small>${q?`<span class="q">x${q}</span>`:''}</button>`;}).join('');
-  const i=byId(gSel),eq=st.weapon===i.id||st.up.includes(i.id);
-  let acts='';
-  if(i.t==='weapon')acts=eq?'<button disabled>Equipped</button>':'<button class="b-gold" data-g="equip">Equip weapon</button>';
-  else if(i.t==='cyberware')acts=eq?'<button class="b-out" data-g="unequip">Unequip</button>':'<button class="b-gold" data-g="equip">Equip to free slot</button>';
-  else if(i.t==='consumable')acts=`<button class="b-gold" data-g="use" ${st.items[i.id]?'':'disabled'}>Use (${st.items[i.id]||0} left)</button>`;
-  else acts='<button disabled>Quest item</button>';
-  const sell=Math.round(i.p*.75);
-  $('#g-detail').innerHTML=`<span class="rt ${i.r}">${i.r} · ${i.t}</span><h2 class="disp" style="font-size:32px;line-height:1.05;text-transform:none;letter-spacing:0">${esc(i.n)}</h2><div class="cond" style="color:var(--gold)">${esc(i.s)}</div><p style="margin:0;color:#e3d8cc">${esc(i.d)}</p><div class="g2">${acts}<button class="b-out" data-g="sell" ${eq||i.t==='loot'?'disabled':''}>Sell · ${sell} cr</button></div>${i.lo?'<a class="cond" href="#loadout" style="font-size:14px">See it on the miniature ›</a>':''}`;
+/* ---------- MISSION GENERATOR (v1.2 tables: type, zone, twist, stakes) ---------- */
+const T_TYPE=[['Bounty Hunt','PvP','8 rounds','3–6 players','Hunt in'],['Duel','1 v 1','6 rounds','2 players','Showdown at'],['Sabotage','Free-for-all','10 rounds','3–6 players','Sabotage at'],['Ambush','PvP','6 rounds','3–6 players','Ambush near'],['Zone War','Teams','8 rounds','4–6 players','War for'],['Covert Op','Teams, hidden objective','8 rounds','4–6 players','Covert job at']];
+const T_ZONE=[['City',['the Saloon','the Black Market','the Hack Terminal']],['City',['the Saloon','the Black Market','the Hack Terminal']],['Desert',['the Train Station','the Smuggler Cache','the Mecha Ruins']],['Desert',['the Train Station','the Smuggler Cache','the Mecha Ruins']],['Corporation',['the Data Vault','the Drone Hub','the Security Sector']],['Orbital Station',['the Cryo Lab','the Reactor','the Docking Bridge']]];
+const T_TWIST=[['Sandstorm','Ranged attacks beyond 4 hexes are 1 harder to hit.'],['Blackout','Line of sight reaches 5 hexes at most.'],['Drone Patrol','2 drones hunt whoever has the biggest bounty.'],['Black Market Open','Buy one item mid-mission at +2 cr.'],['Double Bounty','Bounty payouts are doubled.'],['Faction Reinforcements','The controlling faction puts a guard on each objective.']];
+const d6=()=>1+Math.floor(Math.random()*6);
+const pip=(v,c)=>`<span class="pip" style="${c?'background:'+c+';color:#241923':''}">${v}</span>`;
+function genMission(){
+  const r1=d6();let r2=d6();const zoneRolls=[r2];
+  const hasKey=st.g&&st.g.own&&st.g.own.keycard;
+  while(r2===6&&!hasKey){r2=d6();zoneRolls.push(r2);}
+  const r3=d6(),s1=d6(),s2=d6(),ty=T_TYPE[r1-1],zn=T_ZONE[r2-1],loc=zn[1][Math.floor(Math.random()*3)],tw=T_TWIST[r3-1];
+  let cr=5+s1+s2,loot=s1+s2===12?'Legendary loot drop':s1===s2?'Rare loot drop':'';
+  const enemyZone=zn[0]==='Corporation';if(enemyZone)cr+=2;
+  const target=r1===1?'You carry a 45 cr bounty: you are a likely target.':'';
+  const id='m'+Date.now();
+  const html=`<div class="gen" id="${id}"><div style="display:flex;justify-content:space-between;gap:8px"><span class="cond" style="font-size:13px;color:var(--gold)">GENERATED · ${ty[0].toUpperCase()} · ${ty[1].toUpperCase()}</span><b style="color:var(--gold);white-space:nowrap">+${cr} cr</b></div>
+    <b style="font-size:17px">${ty[4]} ${loc}</b>
+    <span class="sub">${zn[0]} · ${ty[2]} · ${ty[3]}${enemyZone?' · enemy-held zone +2 cr':''}</span>
+    <span><b style="color:var(--magl)">${tw[0]}:</b> ${tw[1]}</span>
+    ${loot?`<span style="color:var(--teal)">${loot} for the winner.</span>`:''}${target?`<span class="sub" style="color:var(--magl)">${target}</span>`:''}
+    <div class="rolls"><span>Type ${pip(r1)}</span><span>Zone ${zoneRolls.map(v=>pip(v)).join('')}</span><span>Twist ${pip(r3)}</span><span>Stakes ${pip(s1)}${pip(s2)}</span></div>
+    ${zoneRolls.length>1?'<span class="sub" style="font-size:12px">Orbital Station rerolled: needs the Orbital Keycard or the expansion.</span>':''}
+    <div class="g2"><button class="b-gold" data-act="join" data-m="${ty[4]} ${loc}">Join</button><button class="b-out" data-act="dismiss" data-id="${id}">Dismiss</button></div></div>`;
+  $('#h-gen').insertAdjacentHTML('afterbegin',html);
+  while($('#h-gen').children.length>3)$('#h-gen').lastElementChild.remove();
 }
-$('#g-chips').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;gFilter=b.dataset.f;renderGear();});
-$('#g-items').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;gSel=b.dataset.i;renderGear();});
-$('#g-detail').addEventListener('click',e=>{const b=e.target.closest('[data-g]');if(!b||b.disabled)return;const i=byId(gSel),a=b.dataset.g;
-  if(a==='equip'){if(i.t==='weapon'){st.weapon=i.id;toast(`${i.n} equipped.`);}else{const k=st.up.indexOf(null);if(k<0){toast('All 3 upgrade slots are full. Unequip one first.');return;}st.up[k]=i.id;toast(`${i.n} in upgrade slot ${k+1}.`);}
-    if(i.lo&&GN.loadoutSet)GN.loadoutSet(i.lo[0],i.lo[1]);}
-  if(a==='unequip'){st.up[st.up.indexOf(i.id)]=null;toast(`${i.n} unequipped.`);}
-  if(a==='use'){st.items[i.id]--;toast(i.id==='nanoheal'?'Nano Heal used: +3 HP.':`${i.n} readied for your next mission.`);}
-  if(a==='sell'){setCr(st.cr+Math.round(i.p*.75));toast(`Sold ${i.n}.`);if(st.items[i.id])st.items[i.id]--;}
-  save();renderGear();});
-register('gear',{show:renderGear});
+$('#h-genbtn').addEventListener('click',genMission);
+$('#h-gen').addEventListener('click',e=>{const b=e.target.closest('[data-act="dismiss"]');if(b){const el=document.getElementById(b.dataset.id);if(el)el.remove();}});
+
+/* ---------- ALLIANCES ---------- */
+if(!st.al)st.al={pacts:[{who:'Neon Kid',type:'Blood pact',left:2,split:'50 / 50'}],traitor:0};
+const PLAYERS=[['Neon Kid','Tech-Slinger'],['Dust Widow','Sniper'],['Iron Jackal','Brawler'],['Copper Sentinel','Brawler']];
+function renderAl(){
+  const A=st.al;
+  $('#h-al').innerHTML=`<div class="vh" style="margin:0"><h2>Alliances</h2><button class="b-out" data-al="new" style="min-height:40px">Propose pact</button></div>
+   ${A.traitor?`<div class="sub" style="color:var(--magl)">Traitor mark: −100 reputation and an automatic 5 cr bounty for 3 days.</div>`:''}
+   ${A.pacts.length?A.pacts.map((p,k)=>`<div class="pact"><span class="av" style="background:#1a3b3d;color:var(--teal)">${esc(p.who.split(' ').map(w=>w[0]).join(''))}</span><div style="flex:1"><b>${esc(p.who)}</b><div class="sub">${esc(p.type)}${p.pending?' · waiting for an answer':p.type==='Blood pact'?` · ${p.left} missions left`:' · this mission'} · split ${esc(p.split)}</div></div>${p.pending?'':`<button class="b-gold" data-al="break" data-k="${k}" style="min-height:40px">Break</button>`}</div>`).join(''):'<p class="sub" style="margin:0">No pacts yet. Allies cannot attack each other and share control points.</p>'}
+   <p class="sub" style="margin:0;font-size:13px">Back to back: +1 to dodge next to an ally. Max alliance size is half the players. No pacts in Duels.</p>`;
+}
+$('#h-al').addEventListener('click',e=>{const b=e.target.closest('[data-al]');if(!b)return;const A=st.al;
+  if(b.dataset.al==='new')modal(`<h2 id="md-t" class="cond" style="color:var(--gold)">Propose a pact</h2>
+    <label class="r">Partner <select id="pa-who">${PLAYERS.filter(p=>!A.pacts.some(x=>x.who===p[0])).map(p=>`<option>${p[0]}</option>`).join('')}</select></label>
+    <label class="r">Type <select id="pa-type"><option>Mission pact</option><option>Blood pact</option></select></label>
+    <p class="sub" style="margin:0">Mission pact: this mission only. Blood pact: 3 missions, both get +1 reputation per shared win.</p>
+    <label class="r">Credit split <select id="pa-split"><option>50 / 50</option><option>60 / 40</option><option>70 / 30</option></select></label>
+    <div class="g2"><button data-close>Cancel</button><button class="b-gold" id="pa-ok">Send offer</button></div>`,(c,close)=>{
+      c.querySelector('#pa-ok').addEventListener('click',()=>{const who=c.querySelector('#pa-who').value;if(!who){close();return;}const p={who,type:c.querySelector('#pa-type').value,left:3,split:c.querySelector('#pa-split').value,pending:true};
+        A.pacts.push(p);save();close();renderAl();toast(`Pact offer sent to ${who}.`);
+        setTimeout(()=>{if(who==='Copper Sentinel'){A.pacts.splice(A.pacts.indexOf(p),1);toast('Copper Sentinel refuses: he is hunting your bounty.');}else{p.pending=false;toast(`${who} accepted the ${p.type.toLowerCase()}.`);}save();renderAl();},2500);});});
+  if(b.dataset.al==='break'){const p=A.pacts[+b.dataset.k];modal(`<h2 id="md-t" class="cond" style="color:var(--gold)">Break the pact with ${esc(p.who)}?</h2>
+    <p style="margin:0">Breaking a pact marks you as a <b style="color:var(--magl)">Traitor</b>: −100 reputation, an automatic 5 cr bounty on you for 3 days, and ${esc(p.who)} gets +1 attack die against you for the rest of the mission.</p>
+    <div class="g2"><button data-close>Keep the pact</button><button class="b-gold" id="br-ok">Break it</button></div>`,(c,close)=>{
+      c.querySelector('#br-ok').addEventListener('click',()=>{A.pacts.splice(+b.dataset.k,1);A.traitor=1;save();close();renderAl();toast(`Pact with ${p.who} broken. You carry the Traitor mark.`);});});}
+});
+renderAl();
+register('home');
 
 /* ---------- TROPHIES ---------- */
 const TR=[['First Blood','First Execution in a ranked match',1,'#71617c'],['Duelist','Win 10 duels',1,'#32d6d0'],['Bounty Hunter','Claim 5 bounties',1,'#c6a15b'],['Survivor','Survive 3 missions with a bounty on you',1,'#ff5d5b'],
@@ -100,5 +106,5 @@ function renderTrophies(){
 register('trophies',{show:renderTrophies});
 
 function start(){setCr(st.cr);window.addEventListener('hashchange',route);route();}
-return {$,$$,esc,toast,modal,register,start,store,st,save,views};
+return {$,$$,esc,toast,modal,register,start,store,st,save,views,addCr:n=>setCr(st.cr+n),setCr};
 })();

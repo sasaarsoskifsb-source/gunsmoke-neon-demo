@@ -116,6 +116,33 @@ select{font:inherit;min-height:42px;border-radius:8px;background:var(--panel2);c
 .slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;text-align:center;font-size:13px}
 .slots div{border-radius:8px;background:var(--ink);border:1px solid var(--line);padding:8px 4px}
 .chips button{border-radius:999px;min-height:38px}
+/* class symbols (animated) */
+.ci{flex:none;overflow:visible}
+.ci.anim .ci-spin{transform-origin:20px 20px;animation:ciSpin 3s steps(6) infinite}
+.ci.anim .ci-jab{animation:ciJab 1.6s ease-in-out infinite}.ci.anim .ci-speed{animation:ciFade 1.6s ease-in-out infinite}
+.ci.anim .ci-flow{stroke-dasharray:4 4;animation:ciFlow 1s linear infinite}
+.ci.anim .ci-blink{animation:ciBlink 1.4s ease-in-out infinite}
+.ci.anim .ci-fade{animation:ciGhost 3s ease-in-out infinite}
+.ci.anim .ci-scope{transform-origin:20px 20px;animation:ciScope 4s ease-in-out infinite}
+@keyframes ciSpin{to{transform:rotate(360deg)}}
+@keyframes ciJab{0%,60%,100%{transform:translateX(0)}70%{transform:translateX(5px)}}
+@keyframes ciFade{0%,60%,100%{opacity:0}70%{opacity:1}}
+@keyframes ciFlow{to{stroke-dashoffset:-8}}
+@keyframes ciBlink{50%{opacity:.25}}
+@keyframes ciGhost{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes ciScope{0%,100%{transform:translate(0,0)}25%{transform:translate(2px,-1px)}50%{transform:translate(-1px,2px)}75%{transform:translate(-2px,-1px)}}
+.cls-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.cls-row button{flex-direction:column;gap:3px;min-height:64px;padding:6px 2px;font-size:12px;letter-spacing:.03em}
+.cls-row span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+@media(max-width:600px){#g-meters{grid-template-columns:minmax(0,1fr)!important}}
+@media(max-width:470px){.cls-row span{display:none}.cls-row button{min-height:52px}}
+.it .fits{display:flex;gap:2px;margin-top:2px}
+.fitchip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 4px;border-radius:999px;background:var(--panel2);font-size:13px}
+@media(prefers-reduced-motion:reduce){.ci *{animation:none!important}}
+.gen{background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.gen .rolls{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--mute)}
+.gen .rolls span{display:inline-flex;align-items:center;gap:4px}
+.pact{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
 /* trophies */
 .tro{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
 .tro>div{border-radius:10px;background:var(--panel);border:1px solid var(--line);padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
@@ -211,7 +238,8 @@ window.GNSplash={hide:hide};})();
       </div>
     </div>
     <div class="col">
-      <div class="card col" style="gap:8px"><div class="vh" style="margin:0"><h2>Missions</h2><span class="sub">3 open</span></div>
+      <div class="card col" style="gap:8px"><div class="vh" style="margin:0"><h2>Missions</h2><button class="b-out" id="h-genbtn" style="min-height:40px">Generate mission</button></div>
+        <div id="h-gen" class="col" style="gap:8px"></div>
         <div class="card mis" style="background:var(--panel2)"><div style="display:flex;justify-content:space-between"><span class="k" style="color:var(--teal)">DYNAMIC PVP · 2 V 2</span><b style="color:var(--gold)">+12 cr</b></div><b>Two teams, one Data Vault</b><span class="sub">Corporation · Sabotage · 10 rounds · 1 slot open</span><button class="b-out" data-act="join" data-m="Two teams, one Data Vault" style="margin-top:6px">Join</button></div>
         <div class="card mis" style="background:var(--panel2);border-left-color:var(--rust)"><div style="display:flex;justify-content:space-between"><span class="k" style="color:#b7a6c2">STORY · AMBUSH</span><b style="color:var(--gold)">+15 cr</b></div><b>Convoy through the desert</b><span class="sub">Desert · Train Station · 6 rounds · 20:00</span><button class="b-out" data-act="join" data-m="Convoy through the desert" style="margin-top:6px">Join</button></div>
         <div class="card mis" style="background:var(--panel2);border-left-color:var(--mag)"><div style="display:flex;justify-content:space-between"><span class="k" style="color:var(--magl)">PLAYER CHALLENGE · DUEL</span><b style="color:var(--gold)">10 cr stake</b></div><b>Neon Kid calls you out at the Saloon</b><span class="sub">City · 1 v 1 · answer by 23:00</span><button class="b-mag" data-act="join" data-m="Duel with Neon Kid" style="margin-top:6px">Accept duel</button></div>
@@ -223,6 +251,7 @@ window.GNSplash={hide:hide};})();
           <div><span class="av" style="background:#332833;color:#9d909b">RJ</span><div style="flex:1"><b style="color:#b0a3ad">Rust Jack</b><div class="sub">Permadeath · back in 1 d 6 h</div></div></div>
         </div>
       </div>
+      <div class="card col" style="gap:8px" id="h-al"></div>
       <div class="g3">
         <a class="btn" href="#gear" style="min-height:72px;flex-direction:column;gap:2px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c6a15b" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Inventory</a>
         <a class="btn" href="#trophies" style="min-height:72px;flex-direction:column;gap:2px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c6a15b" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/></svg>Trophies</a>
@@ -244,7 +273,7 @@ window.GNSplash={hide:hide};})();
       <div id="ar-tray" hidden title="Tap to roll again"></div>
     </div>
     <div class="col">
-      <div class="card"><h2 style="margin-bottom:8px">Miniature</h2><div class="g3" id="ar-pick"><button data-m="outlaw" class="on-t">Pistolwhisker</button><button data-m="sentinel">Copper Sentinel</button><button data-m="vigilante">Vigilante</button></div></div>
+      <div class="card"><h2 style="margin-bottom:8px">Miniature</h2><div class="row" id="ar-pick" role="group" aria-label="Miniature"></div><a class="cond" href="#loadout" style="display:inline-block;margin-top:8px;font-size:14px">Upload your own character ›</a></div>
       <div class="card"><h2 style="margin-bottom:8px">Camera</h2>
         <div class="g2"><button id="ar-cam" class="b-teal">Live camera</button><label class="btn filebtn" id="ar-snapbtn">Snap photo<input id="ar-file" type="file" accept="image/*" capture="environment"></label><button id="ar-manual" style="grid-column:1/-1">Mark 4 corners by hand</button></div>
         <p class="sub" id="ar-note" style="margin:8px 0 0">Dark or wooden table, whole sheet in frame, no glare.</p></div>
@@ -284,7 +313,8 @@ window.GNSplash={hide:hide};})();
   <div class="vh"><h1>Inventory</h1><a href="#loadout" class="cond">3D loadout ›</a></div>
   <div class="grid2" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)">
     <div class="col">
-      <div class="card"><h2 style="margin-bottom:8px">Equipped</h2><div class="slots" id="g-slots"></div></div>
+      <div class="card col" id="g-class" style="gap:12px"></div>
+      <div class="card"><h2 style="margin-bottom:8px">Equipped</h2><div class="slots" id="g-slots"></div><div class="g3" id="g-meters" style="margin-top:10px;gap:12px"></div></div>
       <div class="row chips" id="g-chips"></div>
       <div class="items" id="g-items"></div>
     </div>
@@ -307,7 +337,7 @@ window.GNSplash={hide:hide};})();
 
 <!-- LOADOUT -->
 <section class="view" id="v-loadout" aria-label="Loadout">
-  <div class="vh"><h1>Loadout</h1><div class="row" id="lo-chars" role="group" aria-label="Character"></div></div>
+  <div class="vh" style="flex-wrap:wrap"><h1>Loadout</h1><div class="row" id="lo-chars" role="group" aria-label="Character"></div><button id="lo-del" hidden class="b-out" style="min-height:38px">Remove uploaded</button></div>
   <div class="grid2" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
     <div id="lo-view"><div id="lo-cam"><button id="lo-spin" class="on-t">Turntable</button><button data-cam="full">Full</button><button data-cam="head">Head</button><button data-cam="back">Back</button></div><div id="lo-load">Loading miniature…</div></div>
     <div class="col">
@@ -335,6 +365,8 @@ window.GNSplash={hide:hide};})();
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="detect.js"></script>
 <script src="app.js"></script>
+<script src="chars.js"></script>
+<script src="gear.js"></script>
 <script src="ar.js"></script>
 <script src="live.js"></script>
 <script src="loadout.js"></script>
