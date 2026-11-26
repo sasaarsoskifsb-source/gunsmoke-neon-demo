@@ -110,7 +110,7 @@ function draw(active){
     s+=`<g opacity="${u.state==='down'?.5:1}"><circle cx="${t.x}" cy="${t.y}" r="15" fill="${TC[u.team]}" stroke="${active===u?'#c6a15b':'#241923'}" stroke-width="${active===u?4:2}"/><text x="${t.x}" y="${t.y+5}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="14" fill="#241923">${u.id}</text></g>`;}
   $('#lv-board').innerHTML=s+'</svg>';
   $('#lv-a').textContent=score[0];$('#lv-b').textContent=score[1];
-  $('#lv-round').textContent=over?'Zone War · Drone Hub · Final':`Zone War · Drone Hub · Round ${round} of ${MAXR}`+(active?` · ${active.name} acting`:'');
+  const mn=GN.maps?GN.maps.get(GN.maps.selected()).n:'Drone Hub';$('#lv-round').textContent=over?`Zone War · ${mn} · Final`:`Zone War · ${mn} · Round ${round} of ${MAXR}`+(active?` · ${active.name} acting`:'');
   $('#lv-units').innerHTML=U.map(u=>`<div class="card" style="padding:9px 11px;${active===u?'border-color:#c6a15b':''}${u.state!=='ok'?';opacity:.6':''}"><div style="display:flex;justify-content:space-between"><b>${esc(u.name)}</b><span style="font-size:13px;color:${TC[u.team]}">${u.hp}/${u.max}</span></div><div class="sub" style="font-size:13px">${u.cls} · ${{ok:'in play',down:'downed',dead:'executed',out:'extracted'}[u.state]}</div><div class="hp"><i style="width:${100*u.hp/u.max}%;background:${TC[u.team]}"></i></div></div>`).join('');
 }
 $('#lv-play').addEventListener('click',e=>{playing=!playing;e.currentTarget.textContent=playing?'Pause':'Play';if(playing&&over)newMatch();schedule();});

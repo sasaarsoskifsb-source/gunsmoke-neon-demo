@@ -68,8 +68,8 @@ button:disabled{opacity:.4;cursor:default}
 .av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;flex:none}
 .feed{display:flex;gap:10px;align-items:center;font-size:14px}
 /* nav */
-.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#1b1119f5;border-top:1px solid var(--line);padding:6px 6px calc(10px + env(safe-area-inset-bottom))}
-.nav a{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:50px;justify-content:center;color:var(--mute);font:600 13px "Barlow Condensed",sans-serif;letter-spacing:.06em}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:#1b1119f5;border-top:1px solid var(--line);padding:6px 6px calc(10px + env(safe-area-inset-bottom))}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:50px;justify-content:center;color:var(--mute);font:600 12px "Barlow Condensed",sans-serif;letter-spacing:.04em}
 .nav a.cur{color:var(--teal)}
 /* AR */
 #ar-stage{position:relative;height:min(68vh,620px);background:#140c13;border:1px solid var(--line);border-radius:12px;overflow:hidden;touch-action:none}
@@ -143,6 +143,11 @@ select{font:inherit;min-height:42px;border-radius:8px;background:var(--panel2);c
 .gen .rolls{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--mute)}
 .gen .rolls span{display:inline-flex;align-items:center;gap:4px}
 .pact{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.thumb{flex-direction:column;gap:4px;padding:6px;min-height:0;text-transform:none;letter-spacing:0;font-size:13px}
+.thumb img{width:100%;aspect-ratio:1;object-fit:contain}
+.mrule{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.mrule:last-child{border:0}
+.mrule b{flex:none;width:7.5em;font:700 14px "Barlow Condensed",sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--gold)}
 /* trophies */
 .tro{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
 .tro>div{border-radius:10px;background:var(--panel);border:1px solid var(--line);padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
@@ -229,7 +234,7 @@ window.GNSplash={hide:hide};})();
         <a class="cta ar" href="#ar"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#32d6d0" stroke-width="2" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg><div><b style="color:var(--teal)">AR Playground</b><div class="sub" style="color:#bde6e3">Put the board on your table</div></div></a>
         <a class="cta live" href="#live"><div class="cond" style="font-size:13px;color:var(--magl)"><span class="live-dot"></span>Live · <span id="h-viewers">12</span> watching</div><div><b style="color:var(--magl)">Watch Live Match</b><div class="sub" style="color:#f3c2bf">Zone War: Drone Hub</div></div></a>
       </div>
-      <div class="map"><img src="map.jpg" alt="Frontier map with Dryridge, Red Canyon, Neon Mesa and The Plant"><span class="tag">Corporation holds 6 of 11 zones</span></div>
+      <a class="map" href="#maps" id="h-map" style="display:block;background:radial-gradient(circle at 50% 50%,#3a2a3e,#1b1119)"><img id="h-mapimg" src="map-dryridge.webp" alt="" style="aspect-ratio:auto;height:240px;object-fit:contain;padding:10px"><span class="tag">Corporation holds 6 of 11 zones</span><span class="tag" id="h-mapname" style="top:auto;bottom:10px;background:#241923e6;border-color:var(--gold);color:var(--gold)">Skirmish map: Dryridge · change ›</span></a>
       <div class="card bounty col" style="gap:8px">
         <div class="vh" style="margin:0"><span class="cond" style="font-size:14px;color:var(--gold)">/// Bounty on your head ///</span><span class="sub" style="color:#e0c995">2 d 14 h left</span></div>
         <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span class="amt">45 cr</span><span>set by Copper Sentinel</span></div>
@@ -274,6 +279,9 @@ window.GNSplash={hide:hide};})();
     </div>
     <div class="col">
       <div class="card"><h2 style="margin-bottom:8px">Miniature</h2><div class="row" id="ar-pick" role="group" aria-label="Miniature"></div><a class="cond" href="#loadout" style="display:inline-block;margin-top:8px;font-size:14px">Upload your own character ›</a></div>
+      <div class="card"><h2 style="margin-bottom:8px">Board</h2><div class="row" id="ar-maps" role="group" aria-label="Board projected on the sheet"></div>
+        <label class="r">Board size <span id="ar-bv">300 mm</span><input id="ar-bs" type="range" min="150" max="600" value="300"></label>
+        <p class="sub" style="margin:4px 0 0;font-size:13px">Tap the board to move your miniature.</p></div>
       <div class="card"><h2 style="margin-bottom:8px">Camera</h2>
         <div class="g2"><button id="ar-cam" class="b-teal">Live camera</button><label class="btn filebtn" id="ar-snapbtn">Snap photo<input id="ar-file" type="file" accept="image/*" capture="environment"></label><button id="ar-manual" style="grid-column:1/-1">Mark 4 corners by hand</button></div>
         <p class="sub" id="ar-note" style="margin:8px 0 0">Dark or wooden table, whole sheet in frame, no glare.</p></div>
@@ -283,11 +291,28 @@ window.GNSplash={hide:hide};})();
         <button id="ar-roll" class="b-gold" style="width:100%;margin-top:8px">Roll dice</button>
         <p id="ar-res" aria-live="polite" style="margin:8px 0 0;min-height:24px"></p></div>
       <div class="card"><h2>Adjust</h2>
-        <label class="r">Height <span id="ar-hv">90 mm</span><input id="ar-h" type="range" min="30" max="200" value="90"></label>
+        <label class="r">Height <span id="ar-hv">60 mm</span><input id="ar-h" type="range" min="30" max="200" value="60"></label>
         <label class="r">Rotation <span id="ar-rv">0°</span><input id="ar-rot" type="range" min="-180" max="180" value="0"></label>
         <label class="r">Camera angle <span id="ar-fv">0.75</span><input id="ar-fov" type="range" min="55" max="110" value="75"></label>
         <div class="g2" style="margin-top:8px"><button id="ar-grid" class="on-t">Hex grid</button><button id="ar-face">Face camera</button></div></div>
     </div>
+  </div>
+</section>
+
+<!-- MAPS -->
+<section class="view" id="v-maps" aria-label="Maps">
+  <div class="vh"><h1>Maps</h1><span class="sub" id="mp-count">4 boards · same A4 sheet in AR</span></div>
+  <div class="grid2" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
+    <div class="col">
+      <div class="card" style="position:relative;padding:10px;background:radial-gradient(circle at 50% 45%,#3a2a3e,#1b1119)">
+        <img id="mp-img" src="map-dryridge.webp" alt="" style="display:block;width:100%;max-height:62vh;object-fit:contain">
+        <button id="mp-prev" aria-label="Previous map" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);min-width:44px;padding:0">‹</button>
+        <button id="mp-next" aria-label="Next map" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);min-width:44px;padding:0">›</button>
+        <span class="tag" id="mp-sel" style="background:#241923e6;border-color:var(--teal);color:var(--teal)" hidden>Selected for skirmish</span>
+      </div>
+      <div class="g4" id="mp-thumbs" role="group" aria-label="All maps"></div>
+    </div>
+    <div class="card col" id="mp-info" style="gap:10px"></div>
   </div>
 </section>
 
@@ -353,6 +378,7 @@ window.GNSplash={hide:hide};})();
 <nav class="nav" aria-label="Main">
   <a href="#home" data-v="home"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10H3z"/></svg>Home</a>
   <a href="#ar" data-v="ar"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7z"/></svg>AR</a>
+  <a href="#maps" data-v="maps"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Maps</a>
   <a href="#live" data-v="live"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="13" rx="2"/><path d="M10 9l5 2.5-5 2.5z"/></svg>Live</a>
   <a href="#gear" data-v="gear"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Gear</a>
   <a href="#trophies" data-v="trophies"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/></svg>Trophies</a>
@@ -367,6 +393,7 @@ window.GNSplash={hide:hide};})();
 <script src="app.js"></script>
 <script src="chars.js"></script>
 <script src="gear.js"></script>
+<script src="maps.js"></script>
 <script src="ar.js"></script>
 <script src="live.js"></script>
 <script src="loadout.js"></script>

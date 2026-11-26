@@ -26,7 +26,7 @@ function register(name,v){views[name]=v||{};}
 const FEED=['Caravan job in Dryridge · New bounties posted','Neon Kid won a duel at the Saloon','Shadow Syndicate took The Plant','Black Market raid in Neon Mesa','Rust Jack returns from permadeath tomorrow'];
 let fi=0;setInterval(()=>{fi=(fi+1)%FEED.length;$('#h-feed').textContent=FEED[fi];},5000);
 $('#v-home').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
-  if(a==='join')toast(`You're queued for “${b.dataset.m}”. The app will call you when the table is ready.`);
+  if(a==='join'){if(b.dataset.map&&b.dataset.map!=='orbital'&&GN.maps)GN.maps.select(b.dataset.map,true);toast(`You're queued for “${b.dataset.m}”${b.dataset.map&&b.dataset.map!=='orbital'?' on '+GN.maps.get(b.dataset.map).n:''}. The app will call you when the table is ready.`);}
   if(a==='challenge')toast(`Challenge sent to ${b.dataset.p}.`);
   if(a==='hunters')modal(`<h2 id="md-t" class="cond">Who's hunting you</h2><div class="list"><div><span class="av" style="background:#3a2c40;color:#b7a6c2">CS</span><div style="flex:1"><b>Copper Sentinel</b><div class="sub">Set the 45 cr bounty · 0.8 km</div></div></div><div><span class="av" style="background:#3e1c22;color:#ff8f8d">DW</span><div style="flex:1"><b>Dust Widow</b><div class="sub">Sniper · tracking since yesterday</div></div></div><div><span class="av" style="background:#1a3b3d;color:#32d6d0">IJ</span><div style="flex:1"><b>Iron Jackal</b><div class="sub">Brawler · same league</div></div></div></div><button class="b-out" data-close>Close</button>`);
   if(a==='bounty')modal(`<h2 id="md-t" class="cond">Place a bounty</h2><p class="sub" style="margin:0">Paid from your credits. Minimum 3 cr. Paid out only on an Execution.</p>
@@ -39,7 +39,7 @@ $('#v-home').addEventListener('click',e=>{const b=e.target.closest('[data-act]')
 
 /* ---------- MISSION GENERATOR (v1.2 tables: type, zone, twist, stakes) ---------- */
 const T_TYPE=[['Bounty Hunt','PvP','8 rounds','3–6 players','Hunt in'],['Duel','1 v 1','6 rounds','2 players','Showdown at'],['Sabotage','Free-for-all','10 rounds','3–6 players','Sabotage at'],['Ambush','PvP','6 rounds','3–6 players','Ambush near'],['Zone War','Teams','8 rounds','4–6 players','War for'],['Covert Op','Teams, hidden objective','8 rounds','4–6 players','Covert job at']];
-const T_ZONE=[['City',['the Saloon','the Black Market','the Hack Terminal']],['City',['the Saloon','the Black Market','the Hack Terminal']],['Desert',['the Train Station','the Smuggler Cache','the Mecha Ruins']],['Desert',['the Train Station','the Smuggler Cache','the Mecha Ruins']],['Corporation',['the Data Vault','the Drone Hub','the Security Sector']],['Orbital Station',['the Cryo Lab','the Reactor','the Docking Bridge']]];
+const zoneFor=r=>{const M=GN.maps;if(r<=4){const m=M.list[r-1];return{id:m.id,n:m.n,spots:m.spots,z:m.zone};}if(r===5){const m=M.get(M.selected());return{id:m.id,n:m.n,spots:m.spots,z:m.zone,pick:1};}return{id:'orbital',n:'Orbital Station',spots:['the Cryo Lab','the Reactor','the Docking Bridge'],z:'Expansion'};};
 const T_TWIST=[['Sandstorm','Ranged attacks beyond 4 hexes are 1 harder to hit.'],['Blackout','Line of sight reaches 5 hexes at most.'],['Drone Patrol','2 drones hunt whoever has the biggest bounty.'],['Black Market Open','Buy one item mid-mission at +2 cr.'],['Double Bounty','Bounty payouts are doubled.'],['Faction Reinforcements','The controlling faction puts a guard on each objective.']];
 const d6=()=>1+Math.floor(Math.random()*6);
 const pip=(v,c)=>`<span class="pip" style="${c?'background:'+c+';color:#241923':''}">${v}</span>`;
@@ -47,19 +47,19 @@ function genMission(){
   const r1=d6();let r2=d6();const zoneRolls=[r2];
   const hasKey=st.g&&st.g.own&&st.g.own.keycard;
   while(r2===6&&!hasKey){r2=d6();zoneRolls.push(r2);}
-  const r3=d6(),s1=d6(),s2=d6(),ty=T_TYPE[r1-1],zn=T_ZONE[r2-1],loc=zn[1][Math.floor(Math.random()*3)],tw=T_TWIST[r3-1];
+  const r3=d6(),s1=d6(),s2=d6(),ty=T_TYPE[r1-1],zn=zoneFor(r2),loc=zn.spots[Math.floor(Math.random()*3)],tw=T_TWIST[r3-1];
   let cr=5+s1+s2,loot=s1+s2===12?'Legendary loot drop':s1===s2?'Rare loot drop':'';
-  const enemyZone=zn[0]==='Corporation';if(enemyZone)cr+=2;
+  const enemyZone=zn.id==='neonmesa'||zn.id==='theplant';if(enemyZone)cr+=2;
   const target=r1===1?'You carry a 45 cr bounty: you are a likely target.':'';
   const id='m'+Date.now();
   const html=`<div class="gen" id="${id}"><div style="display:flex;justify-content:space-between;gap:8px"><span class="cond" style="font-size:13px;color:var(--gold)">GENERATED · ${ty[0].toUpperCase()} · ${ty[1].toUpperCase()}</span><b style="color:var(--gold);white-space:nowrap">+${cr} cr</b></div>
     <b style="font-size:17px">${ty[4]} ${loc}</b>
-    <span class="sub">${zn[0]} · ${ty[2]} · ${ty[3]}${enemyZone?' · enemy-held zone +2 cr':''}</span>
+    <span class="sub">Map: <b style="color:var(--bone)">${zn.n}</b>${zn.pick?' (your pick)':''} · ${ty[2]} · ${ty[3]}${enemyZone?' · Corporation-held +2 cr':''}</span>
     <span><b style="color:var(--magl)">${tw[0]}:</b> ${tw[1]}</span>
     ${loot?`<span style="color:var(--teal)">${loot} for the winner.</span>`:''}${target?`<span class="sub" style="color:var(--magl)">${target}</span>`:''}
     <div class="rolls"><span>Type ${pip(r1)}</span><span>Zone ${zoneRolls.map(v=>pip(v)).join('')}</span><span>Twist ${pip(r3)}</span><span>Stakes ${pip(s1)}${pip(s2)}</span></div>
     ${zoneRolls.length>1?'<span class="sub" style="font-size:12px">Orbital Station rerolled: needs the Orbital Keycard or the expansion.</span>':''}
-    <div class="g2"><button class="b-gold" data-act="join" data-m="${ty[4]} ${loc}">Join</button><button class="b-out" data-act="dismiss" data-id="${id}">Dismiss</button></div></div>`;
+    <div class="g2"><button class="b-gold" data-act="join" data-m="${ty[4]} ${loc}" data-map="${zn.id}">Join</button><button class="b-out" data-act="dismiss" data-id="${id}">Dismiss</button></div></div>`;
   $('#h-gen').insertAdjacentHTML('afterbegin',html);
   while($('#h-gen').children.length>3)$('#h-gen').lastElementChild.remove();
 }
