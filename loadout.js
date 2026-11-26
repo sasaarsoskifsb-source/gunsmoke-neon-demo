@@ -86,7 +86,11 @@ const GLOW=c=>new THREE.MeshStandardMaterial({color:0x000000,emissive:c,emissive
 const COL={bone:0xf1e9db,rust:0xB95632,teal:0x32d6d0,gold:0xc6a15b,ink:0x241923,mag:0xff5d5b,leather:0x5a3420,steel:0x8d949e,wood:0x6b4428};
 const mesh=(g,m,p,r)=>{const o=new THREE.Mesh(g,m);if(p)o.position.set(...p);if(r)o.rotation.set(...r);return o;};
 // sidra za Pistolwhisker (izmjereno iz modela, stopala na y=0, lice prema +Z)
-const A={head:[.05,1.74,0],hatY:1.8,face:[.1,1.75,.12],backC:[.0,1.22,-.2],waistY:1.0,hipL:[-.21,.97,.04],hipR:[.21,.97,.04],shL:[-.22,1.41,-.01]};
+const CHARS={
+ outlaw:{name:'Pistolwhisker',cls:'Gunslinger',head:[.05,1.74,0],hatY:1.8,face:[.1,1.75,.12],backC:[.0,1.22,-.2],hipL:[-.21,.97,.04],hipR:[.21,.97,.04],shL:[-.22,1.41,-.01],belt:[.02,1.0,.02,1.1,.95],halo:2.02,spine:[0,1.5,-.19]},
+ vigilante:{name:'Vigilante',cls:'Gunslinger',head:[.07,1.69,-.03],hatY:1.8,face:[.11,1.72,.1],backC:[.06,1.28,-.3],hipL:[-.18,.97,0],hipR:[.38,.97,0],shL:[.3,1.44,0],belt:[.12,1.0,-.02,1.45,1.05],halo:2.04,spine:[.06,1.55,-.27]}};
+let charId=GN.store.get('char','outlaw');if(!CHARS[charId])charId='outlaw';
+let A=CHARS[charId];
 function build(slot,id){
   const g=new THREE.Group();
   if(slot==='head'){
@@ -99,7 +103,7 @@ function build(slot,id){
     g.add(mesh(ring,id==='neon'?GLOW(COL.teal):M(COL.leather,{roughness:.8}),[0,0,0],[Math.PI/2,0,0]));
     if(id==='buckle')g.add(mesh(new THREE.BoxGeometry(.07,.05,.02),M(COL.gold,{metalness:.9,roughness:.25}),[0,0,.215]));
     if(id==='grenade')for(let i=0;i<4;i++){const a=-.9+i*.6;g.add(mesh(new THREE.SphereGeometry(.035,16,12),M(0x3b4a2f,{roughness:.6}),[Math.sin(a)*.22,-.02,Math.cos(a)*.22]));g.add(mesh(new THREE.CylinderGeometry(.008,.008,.02,8),GLOW(COL.gold),[Math.sin(a)*.22,.02,Math.cos(a)*.22]));}
-    g.scale.set(1.1,1,.95);g.position.set(.02,A.waistY,.02);
+    g.scale.set(A.belt[3],1,A.belt[4]);g.position.set(A.belt[0],A.belt[1],A.belt[2]);
   }
   if(slot==='weapon'){
     const holster=(x,side)=>{const h=new THREE.Group();h.add(mesh(new THREE.BoxGeometry(.06,.16,.05),M(COL.leather,{roughness:.8})));h.add(mesh(new THREE.BoxGeometry(.035,.09,.03),M(COL.wood),[0,.11,-.01],[.3,0,0]));h.add(mesh(new THREE.CylinderGeometry(.018,.018,.03,12),M(COL.steel,{metalness:.9,roughness:.3}),[0,.06,.01],[Math.PI/2,0,0]));h.position.set(x,0,0);h.rotation.z=side*.12;return h;};
@@ -115,14 +119,14 @@ function build(slot,id){
     if(id==='datapack'){g.add(mesh(new THREE.BoxGeometry(.28,.32,.12),M(COL.ink,{roughness:.5})));g.add(mesh(new THREE.BoxGeometry(.2,.02,.005),GLOW(COL.teal),[0,.06,-.062]));g.add(mesh(new THREE.BoxGeometry(.2,.02,.005),GLOW(COL.teal),[0,0,-.062]));g.add(mesh(new THREE.BoxGeometry(.08,.08,.03),M(COL.rust),[0,-.09,-.07]));g.position.set(A.backC[0],A.backC[1],A.backC[2]-.07);}
   }
   if(slot==='shoulder'&&id!=='none'){
-    if(id==='pauldron'){const p=mesh(new THREE.SphereGeometry(.11,24,16,0,Math.PI*2,0,Math.PI/2),M(COL.rust,{metalness:.6,roughness:.45}));p.scale.set(1,.7,1.1);g.add(p);g.add(mesh(new THREE.TorusGeometry(.105,.008,8,32),M(COL.gold,{metalness:.9}),[0,.005,0],[Math.PI/2,0,0]));g.rotation.z=.5;}
-    if(id==='shield'){g.add(mesh(new THREE.TorusGeometry(.09,.012,10,32),M(COL.steel,{metalness:.9}),[0,0,0],[0,Math.PI/2,0]));g.add(mesh(new THREE.CircleGeometry(.085,32),Object.assign(GLOW(COL.teal),{transparent:true,opacity:.55,side:THREE.DoubleSide}),[0,0,0],[0,Math.PI/2,0]));g.position.x=-.06;}
+    if(id==='pauldron'){const p=mesh(new THREE.SphereGeometry(.11,24,16,0,Math.PI*2,0,Math.PI/2),M(COL.rust,{metalness:.6,roughness:.45}));p.scale.set(1,.7,1.1);g.add(p);g.add(mesh(new THREE.TorusGeometry(.105,.008,8,32),M(COL.gold,{metalness:.9}),[0,.005,0],[Math.PI/2,0,0]));g.rotation.z=A.shL[0]<0?.5:-.5;}
+    if(id==='shield'){g.add(mesh(new THREE.TorusGeometry(.09,.012,10,32),M(COL.steel,{metalness:.9}),[0,0,0],[0,Math.PI/2,0]));g.add(mesh(new THREE.CircleGeometry(.085,32),Object.assign(GLOW(COL.teal),{transparent:true,opacity:.55,side:THREE.DoubleSide}),[0,0,0],[0,Math.PI/2,0]));g.position.x=Math.sign(A.shL[0])*.06;}
     g.position.add(new THREE.Vector3(...A.shL));
   }
   if(slot==='cyber'&&id!=='none'){
     if(id==='eye'){g.add(mesh(new THREE.SphereGeometry(.022,16,12),GLOW(COL.teal),A.face));g.add(mesh(new THREE.TorusGeometry(.028,.005,8,20),M(COL.steel,{metalness:.9}),A.face));}
-    if(id==='halo'){const h=mesh(new THREE.TorusGeometry(.16,.012,10,48),GLOW(COL.gold),[A.head[0],2.02,0],[Math.PI/2,0,0]);h.userData.spin=true;g.add(h);}
-    if(id==='spine')for(let i=0;i<6;i++)g.add(mesh(new THREE.SphereGeometry(.016,12,10),GLOW(COL.mag),[.0,1.5-i*.08,-.19+i*.005]));
+    if(id==='halo'){const h=mesh(new THREE.TorusGeometry(.16,.012,10,48),GLOW(COL.gold),[A.head[0],A.halo,A.head[2]],[Math.PI/2,0,0]);h.userData.spin=true;g.add(h);}
+    if(id==='spine')for(let i=0;i<6;i++)g.add(mesh(new THREE.SphereGeometry(.016,12,10),GLOW(COL.mag),[A.spine[0],A.spine[1]-i*.08,A.spine[2]+i*.005]));
   }
   if(slot==='base'){
     const top=M(COL.ink,{roughness:.6}),edge=M(COL.rust,{roughness:.5});
@@ -159,13 +163,16 @@ cv.addEventListener('wheel',e=>{e.preventDefault();tDist=Math.max(1.6,Math.min(8
 new ResizeObserver(()=>{const w=view.clientWidth,h=view.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}).observe(view);
 /* ---------- model ---------- */
 const loader=new THREE.GLTFLoader();
+const scenes={};
 function load(){
-  if(!window.GN_EMBED||!GN_EMBED.outlaw){const sc=document.createElement('script');sc.src='m-outlaw.js';sc.onload=load;sc.onerror=()=>{$('#lo-load').textContent='Miniature failed to load.';};document.head.appendChild(sc);return;}
-  loader.load('data:model/gltf-binary;base64,'+GN_EMBED.outlaw,gl=>{
-    model=gl.scene;model.traverse(n=>{if(n.isMesh){const m=n.material;m.userData.met=m.metalness;mats.push(m);}});
-    rig.add(model);$('#lo-load').remove();apply();
-  },undefined,()=>{$('#lo-load').textContent='Miniature failed to load.';});
+  const id=charId;
+  if(!window.GN_EMBED||!GN_EMBED[id]){const sc=document.createElement('script');sc.src='m-'+id+'.js';sc.onload=load;sc.onerror=()=>{const l=$('#lo-load');if(l)l.textContent='Miniature failed to load.';};document.head.appendChild(sc);return;}
+  const use=sc=>{if(id!==charId)return;if(model)rig.remove(model);model=sc;mats=[];model.traverse(n=>{if(n.isMesh){const m=n.material;if(m.userData.met===undefined)m.userData.met=m.metalness;mats.push(m);}});
+    rig.add(model);const l=$('#lo-load');if(l)l.remove();apply();};
+  if(scenes[id]){use(scenes[id]);return;}
+  loader.load('data:model/gltf-binary;base64,'+GN_EMBED[id],gl=>{scenes[id]=gl.scene;use(gl.scene);},undefined,()=>{const l=$('#lo-load');if(l)l.textContent='Miniature failed to load.';});
 }
+GN.loChar=id=>{if(!CHARS[id]||id===charId)return;charId=id;A=CHARS[id];GN.store.set('char',id);load();};
 load();
 let t0=performance.now();
 function loop(t){
@@ -179,6 +186,9 @@ function loop(t){
 GN.loStart=()=>{t0=performance.now();requestAnimationFrame(loop);};GN.loStart();
 }
 
+function renderChars(){const el=$('#lo-chars');if(!el)return;el.innerHTML=Object.entries({outlaw:'Pistolwhisker',vigilante:'Vigilante'}).map(([k,n])=>`<button data-c="${k}" class="${k===GN.store.get('char','outlaw')?'on-t':''}" aria-pressed="${k===GN.store.get('char','outlaw')}">${n}</button>`).join('');}
+renderChars();
+$('#lo-chars').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;GN.store.set('char',b.dataset.c);renderChars();if(GN.loChar)GN.loChar(b.dataset.c);});
 GN.loadoutSet=(slotId,id)=>{cur[slotId]=id;try{localStorage.setItem('gn-loadout',JSON.stringify(cur));}catch(e){}renderUI();apply();};
 GN.register('loadout',{show(){visible=true;if(!started)init3d();else if(GN.loStart)GN.loStart();},hide(){visible=false;}});
 }

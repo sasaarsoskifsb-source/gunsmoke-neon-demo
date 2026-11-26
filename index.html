@@ -244,7 +244,7 @@ window.GNSplash={hide:hide};})();
       <div id="ar-tray" hidden title="Tap to roll again"></div>
     </div>
     <div class="col">
-      <div class="card"><h2 style="margin-bottom:8px">Miniature</h2><div class="g2" id="ar-pick"><button data-m="outlaw" class="on-t">Pistolwhisker</button><button data-m="sentinel">Copper Sentinel</button></div></div>
+      <div class="card"><h2 style="margin-bottom:8px">Miniature</h2><div class="g3" id="ar-pick"><button data-m="outlaw" class="on-t">Pistolwhisker</button><button data-m="sentinel">Copper Sentinel</button><button data-m="vigilante">Vigilante</button></div></div>
       <div class="card"><h2 style="margin-bottom:8px">Camera</h2>
         <div class="g2"><button id="ar-cam" class="b-teal">Live camera</button><label class="btn filebtn" id="ar-snapbtn">Snap photo<input id="ar-file" type="file" accept="image/*" capture="environment"></label><button id="ar-manual" style="grid-column:1/-1">Mark 4 corners by hand</button></div>
         <p class="sub" id="ar-note" style="margin:8px 0 0">Dark or wooden table, whole sheet in frame, no glare.</p></div>
@@ -307,7 +307,7 @@ window.GNSplash={hide:hide};})();
 
 <!-- LOADOUT -->
 <section class="view" id="v-loadout" aria-label="Loadout">
-  <div class="vh"><h1>Loadout</h1><span class="cond" style="color:var(--gold)">Pistolwhisker · Gunslinger</span></div>
+  <div class="vh"><h1>Loadout</h1><div class="row" id="lo-chars" role="group" aria-label="Character"></div></div>
   <div class="grid2" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
     <div id="lo-view"><div id="lo-cam"><button id="lo-spin" class="on-t">Turntable</button><button data-cam="full">Full</button><button data-cam="head">Head</button><button data-cam="back">Back</button></div><div id="lo-load">Loading miniature…</div></div>
     <div class="col">
