@@ -98,6 +98,13 @@ select{font:inherit;min-height:42px;border-radius:8px;background:var(--panel2);c
 #lv-feed{list-style:none;margin:0;padding:0;max-height:330px;overflow-y:auto}
 #lv-feed li{padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
 #lv-feed li:last-child{border:0}
+.skfeed{list-style:none;margin:0;padding:0;max-height:340px;overflow-y:auto}.skfeed li{padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}.skfeed li.res{background:linear-gradient(90deg,rgba(198,161,91,.12),transparent);padding-left:6px}
+#sk-banner{position:absolute;left:10px;top:10px;z-index:4;background:rgba(36,25,35,.85);border:1px solid var(--gold);color:var(--bone);border-radius:8px;padding:6px 10px;font-size:14px;font-family:inherit}
+.sk-u{border:1px solid var(--line);border-radius:10px;padding:8px}.sk-u.cur{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}.sk-u.out{opacity:.55}
+#sk-prompt{border-color:var(--gold)}#sk-prompt .row{margin-top:8px}
+.sk-t{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}.sk-t td,.sk-t th{padding:4px;border-bottom:1px solid var(--line);text-align:left}
+#ar-stage.vtable{background:radial-gradient(circle at 50% 40%,#3a2a3e,#140c13)}
+#sk-n,#sk-mode,#sk-dice{width:100%;margin-top:4px}
 .pip{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;background:#4b3a4d;color:var(--mute);font-weight:600;font-size:13px;margin-right:2px}
 .pip.h{background:var(--gold);color:#1a1205}
 .hp{height:6px;border-radius:3px;background:var(--line);margin-top:5px;overflow:hidden}.hp i{display:block;height:100%}
@@ -284,13 +291,28 @@ window.GNSplash={hide:hide};})();
 <section class="view" id="v-ar" aria-label="AR Playground">
   <div class="vh"><h1>AR Playground</h1><span class="sub">White A4 sheet = your table board</span></div>
   <div class="grid2" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)">
+    <div class="col" style="min-width:0">
     <div id="ar-stage">
+      <div id="sk-banner" hidden></div>
       <div id="ar-empty"><div><b>Put a white A4 sheet on the table</b><span id="ar-hint">Start the camera or snap a photo of the sheet.</span><br>Your miniature stands in the middle of it.<div class="row" style="justify-content:center;margin-top:14px"><button class="b-teal" id="ar-cam2">Start AR camera</button><label class="btn b-gold filebtn">Snap the table<input id="ar-file2" type="file" accept="image/*" capture="environment"></label></div></div></div>
       <label class="btn b-gold filebtn" id="ar-again" hidden style="position:absolute;left:10px;bottom:10px;z-index:3">Snap again<input id="ar-file3" type="file" accept="image/*" capture="environment"></label>
       <div id="ar-status" hidden></div>
       <div id="ar-tray" hidden title="Tap to roll again"></div>
     </div>
+    <div id="sk-play" hidden class="col">
+      <div id="sk-prompt" class="card" hidden aria-live="assertive"></div>
+      <div class="card"><div class="vh" style="margin:0 0 6px"><h2>Actions</h2><button class="b-out" id="sk-quit" style="min-height:34px;padding:4px 12px;font-size:14px">Leave match</button></div><div id="sk-acts"></div></div>
+      <div class="card"><h2 style="margin-bottom:6px">Status</h2><div id="sk-units" class="col" style="gap:8px"></div></div>
+      <div class="card" id="sk-round" hidden></div>
+      <div class="card"><h2 style="margin-bottom:4px">Match feed</h2><ol id="sk-feed" class="skfeed" aria-live="polite"></ol></div>
+    </div>
+    </div>
     <div class="col">
+      <div class="card" id="sk-setup"><h2 style="margin-bottom:6px">Skirmish</h2><p class="sub" style="margin:0 0 8px;font-size:14px">Play a match with your active hero on the projected board: move, shoot, dodge, react, grab supplies and hold the flags. Works on the scanned sheet or on a virtual table.</p>
+        <div class="g2"><label class="r" style="margin:0">Opponents<select id="sk-n"><option value="1">1 bot</option><option value="2" selected>2 bots</option><option value="3">3 bots</option></select></label>
+        <label class="r" style="margin:0">Mode<select id="sk-mode"><option value="team">You vs gang</option><option value="ffa">Free-for-all</option></select></label>
+        <label class="r" style="margin:0;grid-column:1/-1">Dice<select id="sk-dice"><option value="virtual">Virtual dice</option><option value="physical">My real dice (I enter hits)</option></select></label></div>
+        <button class="b-gold" id="sk-start" style="width:100%;margin-top:10px">Start skirmish</button></div>
       <div class="card"><h2 style="margin-bottom:8px">Miniature</h2><div class="row" id="ar-pick" role="group" aria-label="Miniature"></div><a class="cond" href="#hero" style="display:inline-block;margin-top:8px;font-size:14px">Upload your own character ›</a></div>
       <div class="card"><h2 style="margin-bottom:8px">Board</h2><div class="row" id="ar-maps" role="group" aria-label="Board projected on the sheet"></div>
         <label class="r">Board size <span id="ar-bv">300 mm</span><input id="ar-bs" type="range" min="150" max="600" value="300"></label>
@@ -415,6 +437,7 @@ window.GNSplash={hide:hide};})();
 <script src="maps.js"></script>
 <script src="hero.js"></script>
 <script src="ar.js"></script>
+<script src="skirmish.js"></script>
 <script src="live.js"></script>
 <script src="loadout.js"></script>
 <script>GN.start();</script>

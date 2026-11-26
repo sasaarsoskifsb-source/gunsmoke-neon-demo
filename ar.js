@@ -94,6 +94,7 @@ const poseFrom=c=>GNDetect.paperPose(c,st.srcW,st.srcH,st.f);
 function stopVideo(){if(st.video){st.video.srcObject&&st.video.srcObject.getTracks().forEach(t=>t.stop());st.video=null;$('#ar-cam').textContent='Live camera';}}
 function setSource(el,w,h){
   if(st.src&&st.src!==el)st.src.remove();if(el!==st.video)stopVideo();
+  stage.classList.remove('vtable');previewOn=false;
   st.src=el;st.srcW=w;st.srcH=h;stage.insertBefore(el,renderer.domElement);$('#ar-empty').hidden=true;autoYaw=null;st.pose=null;paper.visible=false;layout();
 }
 function usePose(c,label){st.corners=c;const p=c&&poseFrom(c);
@@ -116,7 +117,7 @@ function bindInput(){
   cv.addEventListener('pointerup',e=>{const d=drag;drag=null;if(!d||d.moved)return;
     if(!st.manual){if(!st.pose)return;const r=cv.getBoundingClientRect();nv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
       paper.updateMatrixWorld(true);rc.setFromCamera(nv,cam);const hit=rc.intersectObject(pickPlane)[0];if(!hit)return;
-      const p=paper.worldToLocal(hit.point.clone());const hx=boardMesh.visible?boardMesh.scale.x/2*.92:148,hy=boardMesh.visible?boardMesh.scale.y/2*.92:105;
+      const p=paper.worldToLocal(hit.point.clone());if(tapHandler&&tapHandler(p))return;const hx=boardMesh.visible?boardMesh.scale.x/2*.92:148,hy=boardMesh.visible?boardMesh.scale.y/2*.92:105;
       miniG.position.set(Math.max(-hx,Math.min(hx,p.x)),Math.max(-hy,Math.min(hy,p.y)),0);say('Miniature moved','ok');return;}
     const r=cv.getBoundingClientRect(),sr=stage.getBoundingClientRect();st.manual.push([(e.clientX-r.left)/r.width*st.srcW,(e.clientY-r.top)/r.height*st.srcH]);
     const dot=document.createElement('div');dot.style.cssText=`position:absolute;z-index:4;width:14px;height:14px;margin:-7px;border-radius:50%;background:#ff5d5b;border:2px solid #fff;left:${e.clientX-sr.left}px;top:${e.clientY-sr.top}px;pointer-events:none`;stage.appendChild(dot);dots.push(dot);
@@ -157,6 +158,17 @@ $('#ar-maps').addEventListener('click',e=>{const b=e.target.closest('[data-b]');
 GN.maps.on(id=>setBoard(id));
 $('#ar-bs').addEventListener('input',e=>{st.bs=+e.target.value;$('#ar-bv').textContent=st.bs+' mm';if(renderer)sizeBoard();});
 $('#ar-face').addEventListener('click',()=>{autoYaw=null;st.rot=0;$('#ar-rot').value=0;$('#ar-rv').textContent='0°';if(st.pose)applyPose(st.pose);});
+let tapHandler=null,previewOn=false;
+function preview(){
+  if(!renderer&&!init())return false;if(st.video)stopVideo();
+  if(st.src){st.src.remove();st.src=null;}
+  $('#ar-empty').hidden=true;stage.classList.add('vtable');st.srcW=stage.clientWidth||800;st.srcH=stage.clientHeight||600;layout();
+  const ph=55*Math.PI/180,r1=[1,0,0],r2=[0,-Math.cos(ph),Math.sin(ph)],r3=[0,-Math.sin(ph),-Math.cos(ph)],t=[0,-15,400];
+  st.pose={r1,r2,r3,t,faces:true};autoYaw=null;applyPose(st.pose);previewOn=true;say('Virtual table','ok');return true;}
+GN.ar={ensure(){return renderer||init();},paper:()=>paper,miniG:()=>miniG,hex:()=>hex,
+  board(){return boardMesh&&boardMesh.visible?{w:boardMesh.scale.x,h:boardMesh.scale.y}:{w:297,h:210};},
+  onTap(f){tapHandler=f;},setHeight(mm){st.h=mm;$('#ar-h').value=mm;$('#ar-hv').textContent=mm+' mm';fit();},
+  hasPose:()=>!!st.pose,preview,setModel(k){loadModel(k);},faceYaw(rad){autoYaw=0;st.rot=rad*180/Math.PI;if(st.pose)applyPose(st.pose);}};
 function loop(t){if(!st.on)return;liveStep(t);renderer.render(scene,cam);raf=requestAnimationFrame(loop);}
 renderPick();renderMaps();
 GN.register('ar',{show(){if(!st.inited&&!init())return;if(!renderer)return;st.on=true;layout();raf=requestAnimationFrame(loop);
