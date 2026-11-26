@@ -20,7 +20,7 @@ const ROSTER=[
  {id:'IJ',name:'Iron Jackal',cls:'Brawler',team:0,hp:9,w:'kat',start:[0,5]},
  {id:'DW',name:'Dust Widow',cls:'Sniper',team:1,hp:6,w:'snp',start:[10,1]},
  {id:'RJ',name:'Rust Jack',cls:'Gunslinger',team:1,hp:7,w:'rev',start:[10,6]}];
-const TC=['#00E5D4','#D93B83'],TN=['Corporation','Shadow Syndicate'];
+const TC=['#32d6d0','#ff5d5b'],TN=['Corporation','Shadow Syndicate'];
 let U=[],round=0,order=[],oi=0,score=[0,0],over=false,playing=true,speed=1,timer=0,visible=false,lastFx=null,viewers=12;
 const tile=u=>tiles.get(u.k),unitAt=k=>U.find(u=>u.k===k&&(u.state==='ok'||u.state==='down'));
 function sight(a,b){const res=[1,-1].map(e=>{const L=line(a,b,e);return{blocked:L.slice(1,-1).some(k=>{const t=tiles.get(k);return!t||t.type==='wall';}),pre:L.length>2?L[L.length-2]:null};});
@@ -74,7 +74,7 @@ function wantDist(u){return{snp:5,rev:3,sg:1,kat:1}[u.w];}
 function act(u){
   const L=[];let moved=false;
   const downed=U.find(t=>t.team!==u.team&&t.state==='down'&&dist(tile(u),tile(t))===1);
-  if(downed){downed.state='dead';feed(`<b>${esc(u.name)}</b> executes <b>${esc(downed.name)}</b>. Permadeath: 3 days. Bounty paid out.`);lastFx={a:u.k,b:downed.k,c:'#F2B544'};return;}
+  if(downed){downed.state='dead';feed(`<b>${esc(u.name)}</b> executes <b>${esc(downed.name)}</b>. Permadeath: 3 days. Bounty paid out.`);lastFx={a:u.k,b:downed.k,c:'#c6a15b'};return;}
   let shot=bestTarget(u,false);
   if(!shot||(u.w!=='snp'&&shot.d>wantDist(u)+1)){
     const R2=reach(u,3);const foes=U.filter(t=>t.team!==u.team&&t.state==='ok');let bk=u.k,bs=1e9;
@@ -101,17 +101,17 @@ const hexPts=(x,y)=>[0,1,2,3,4,5].map(i=>{const a=Math.PI/180*(60*i-30);return(x
 function draw(active){
   let s=`<svg viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" role="img" aria-label="Board: round ${round}, Corporation ${score[0]}, Syndicate ${score[1]}"><rect width="100%" height="100%" fill="#1a1410"/>`;
   for(const t of tiles.values()){const cp=CPS.includes(t.k);
-    s+=`<polygon points="${hexPts(t.x,t.y)}" fill="${t.type==='wall'?'#2c3846':cp?'#2a2414':(t.q+t.r)%2?'#2a2118':'#261e16'}" stroke="${cp?'#F2B544':'#3b3024'}" stroke-width="${cp?2:1}"/>`;
+    s+=`<polygon points="${hexPts(t.x,t.y)}" fill="${t.type==='wall'?'#4b3a4d':cp?'#3a2d1e':(t.q+t.r)%2?'#2a2118':'#261e16'}" stroke="${cp?'#c6a15b':'#3b3024'}" stroke-width="${cp?2:1}"/>`;
     if(t.type==='crate')s+=`<rect x="${t.x-9}" y="${t.y-9}" width="18" height="18" rx="2" fill="#8a5a2b" stroke="#5a3a1a"/>`;
-    if(t.type==='wall')s+=`<rect x="${t.x-12}" y="${t.y-3}" width="24" height="6" fill="#D93B83" opacity=".7"/>`;
-    if(cp){const c=[0,0];U.forEach(u=>{if(u.state==='ok'&&dist(tile(u),t)<=1)c[u.team]++;});const col=c[0]>c[1]?TC[0]:c[1]>c[0]?TC[1]:'#F2B544';s+=`<circle cx="${t.x}" cy="${t.y}" r="6" fill="${col}"/>`;}}
+    if(t.type==='wall')s+=`<rect x="${t.x-12}" y="${t.y-3}" width="24" height="6" fill="#ff5d5b" opacity=".7"/>`;
+    if(cp){const c=[0,0];U.forEach(u=>{if(u.state==='ok'&&dist(tile(u),t)<=1)c[u.team]++;});const col=c[0]>c[1]?TC[0]:c[1]>c[0]?TC[1]:'#c6a15b';s+=`<circle cx="${t.x}" cy="${t.y}" r="6" fill="${col}"/>`;}}
   if(lastFx){const a=tiles.get(lastFx.a),b=tiles.get(lastFx.b);s+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${lastFx.c}" stroke-width="3" stroke-dasharray="6 4" opacity=".9"/>`;}
   for(const u of U){if(u.state==='dead'||u.state==='out')continue;const t=tile(u);
-    s+=`<g opacity="${u.state==='down'?.5:1}"><circle cx="${t.x}" cy="${t.y}" r="15" fill="${TC[u.team]}" stroke="${active===u?'#F2B544':'#111820'}" stroke-width="${active===u?4:2}"/><text x="${t.x}" y="${t.y+5}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="14" fill="#111820">${u.id}</text></g>`;}
+    s+=`<g opacity="${u.state==='down'?.5:1}"><circle cx="${t.x}" cy="${t.y}" r="15" fill="${TC[u.team]}" stroke="${active===u?'#c6a15b':'#241923'}" stroke-width="${active===u?4:2}"/><text x="${t.x}" y="${t.y+5}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="14" fill="#241923">${u.id}</text></g>`;}
   $('#lv-board').innerHTML=s+'</svg>';
   $('#lv-a').textContent=score[0];$('#lv-b').textContent=score[1];
   $('#lv-round').textContent=over?'Zone War · Drone Hub · Final':`Zone War · Drone Hub · Round ${round} of ${MAXR}`+(active?` · ${active.name} acting`:'');
-  $('#lv-units').innerHTML=U.map(u=>`<div class="card" style="padding:9px 11px;${active===u?'border-color:#F2B544':''}${u.state!=='ok'?';opacity:.6':''}"><div style="display:flex;justify-content:space-between"><b>${esc(u.name)}</b><span style="font-size:13px;color:${TC[u.team]}">${u.hp}/${u.max}</span></div><div class="sub" style="font-size:13px">${u.cls} · ${{ok:'in play',down:'downed',dead:'executed',out:'extracted'}[u.state]}</div><div class="hp"><i style="width:${100*u.hp/u.max}%;background:${TC[u.team]}"></i></div></div>`).join('');
+  $('#lv-units').innerHTML=U.map(u=>`<div class="card" style="padding:9px 11px;${active===u?'border-color:#c6a15b':''}${u.state!=='ok'?';opacity:.6':''}"><div style="display:flex;justify-content:space-between"><b>${esc(u.name)}</b><span style="font-size:13px;color:${TC[u.team]}">${u.hp}/${u.max}</span></div><div class="sub" style="font-size:13px">${u.cls} · ${{ok:'in play',down:'downed',dead:'executed',out:'extracted'}[u.state]}</div><div class="hp"><i style="width:${100*u.hp/u.max}%;background:${TC[u.team]}"></i></div></div>`).join('');
 }
 $('#lv-play').addEventListener('click',e=>{playing=!playing;e.currentTarget.textContent=playing?'Pause':'Play';if(playing&&over)newMatch();schedule();});
 $('#lv-speed').addEventListener('click',e=>{speed=speed===1?2:speed===2?4:1;e.currentTarget.textContent=`Speed ${speed}×`;schedule();});

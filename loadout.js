@@ -75,15 +75,15 @@ renderer.setPixelRatio(Math.min(2,devicePixelRatio||1));renderer.outputEncoding=
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
 view.prepend(renderer.domElement);
 const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(32,1,.05,50);
-scene.add(new THREE.HemisphereLight(0xfff1d8,0x1a2230,.9));
+scene.add(new THREE.HemisphereLight(0xfff1d8,0x2a1b2c,.9));
 const key=new THREE.DirectionalLight(0xffe8c8,1.6);key.position.set(2,4,3);scene.add(key);
-const rimT=new THREE.PointLight(0x00E5D4,2.2,8);rimT.position.set(-2,2,-1.5);scene.add(rimT);
-const rimM=new THREE.PointLight(0xD93B83,1.6,8);rimM.position.set(2,1.2,-2);scene.add(rimM);
-const floor=new THREE.Mesh(new THREE.CircleGeometry(3,64),new THREE.MeshStandardMaterial({color:0x0c1117,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.06;scene.add(floor);
+const rimT=new THREE.PointLight(0x32d6d0,2.2,8);rimT.position.set(-2,2,-1.5);scene.add(rimT);
+const rimM=new THREE.PointLight(0xff5d5b,1.6,8);rimM.position.set(2,1.2,-2);scene.add(rimM);
+const floor=new THREE.Mesh(new THREE.CircleGeometry(3,64),new THREE.MeshStandardMaterial({color:0x1b1119,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.06;scene.add(floor);
 const rig=new THREE.Group();scene.add(rig);
 const M=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.55,metalness:.25},o));
 const GLOW=c=>new THREE.MeshStandardMaterial({color:0x000000,emissive:c,emissiveIntensity:1.6,roughness:.4});
-const COL={bone:0xE8D9B5,rust:0xB95632,teal:0x00E5D4,gold:0xF2B544,ink:0x111820,mag:0xD93B83,leather:0x5a3420,steel:0x8d949e,wood:0x6b4428};
+const COL={bone:0xf1e9db,rust:0xB95632,teal:0x32d6d0,gold:0xc6a15b,ink:0x241923,mag:0xff5d5b,leather:0x5a3420,steel:0x8d949e,wood:0x6b4428};
 const mesh=(g,m,p,r)=>{const o=new THREE.Mesh(g,m);if(p)o.position.set(...p);if(r)o.rotation.set(...r);return o;};
 // sidra za Pistolwhisker (izmjereno iz modela, stopala na y=0, lice prema +Z)
 const A={head:[.05,1.74,0],hatY:1.8,face:[.1,1.75,.12],backC:[.0,1.22,-.2],waistY:1.0,hipL:[-.21,.97,.04],hipR:[.21,.97,.04],shL:[-.22,1.41,-.01]};

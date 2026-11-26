@@ -35,13 +35,13 @@ function init(){
   scene.add(new THREE.HemisphereLight(0xfff2e0,0x302040,1.0));
   const key=new THREE.DirectionalLight(0xffffff,1.1);key.position.set(200,-300,600);scene.add(key);
   paper=new THREE.Group();paper.matrixAutoUpdate=false;paper.visible=false;scene.add(paper);paper.add(key.target);
-  paper.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([[-148.5,-105],[148.5,-105],[148.5,105],[-148.5,105],[-148.5,-105]].map(([x,y])=>new THREE.Vector3(x,y,.3))),new THREE.LineBasicMaterial({color:0xD93B83})));
+  paper.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([[-148.5,-105],[148.5,-105],[148.5,105],[-148.5,105],[-148.5,-105]].map(([x,y])=>new THREE.Vector3(x,y,.3))),new THREE.LineBasicMaterial({color:0xff5d5b})));
   const pts=[],R=17;
   for(let r=-4;r<=4;r++)for(let q=-6;q<=6;q++){const cx=R*Math.sqrt(3)*(q+(r&1)/2),cy=R*1.5*r;if(Math.abs(cx)>148.5-R*.87||Math.abs(cy)>105-R)continue;
     for(let i=0;i<6;i++){const a=Math.PI/180*(60*i-30),b=Math.PI/180*(60*i+30);pts.push(new THREE.Vector3(cx+R*Math.cos(a),cy+R*Math.sin(a),.25),new THREE.Vector3(cx+R*Math.cos(b),cy+R*Math.sin(b),.25));}}
-  hex=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0x00E5D4,transparent:true,opacity:.55}));paper.add(hex);
+  hex=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0x32d6d0,transparent:true,opacity:.55}));paper.add(hex);
   shadow=new THREE.Mesh(new THREE.CircleGeometry(1,40),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.35,depthWrite:false}));shadow.position.z=.4;paper.add(shadow);
-  baseRing=new THREE.Mesh(new THREE.RingGeometry(.92,1,48),new THREE.MeshBasicMaterial({color:0xF2B544}));baseRing.position.z=.5;paper.add(baseRing);
+  baseRing=new THREE.Mesh(new THREE.RingGeometry(.92,1,48),new THREE.MeshBasicMaterial({color:0xc6a15b}));baseRing.position.z=.5;paper.add(baseRing);
   pivot=new THREE.Group();paper.add(pivot);loader=new THREE.GLTFLoader();
   dc=document.createElement('canvas');dctx=dc.getContext('2d',{willReadFrequently:true});
   new ResizeObserver(layout).observe(stage);bindInput();loadModel(st.model);return true;
@@ -96,7 +96,7 @@ function bindInput(){
   cv.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x;if(Math.abs(dx)>4)drag.moved=true;if(drag.moved&&st.pose&&!st.manual){st.rot=((st.rot+dx*.6+540)%360)-180;drag.x=e.clientX;$('#ar-rot').value=st.rot|0;$('#ar-rv').textContent=(st.rot|0)+'°';if(!st.video)applyPose(st.pose);}});
   cv.addEventListener('pointerup',e=>{const d=drag;drag=null;if(!d||d.moved||!st.manual)return;
     const r=cv.getBoundingClientRect(),sr=stage.getBoundingClientRect();st.manual.push([(e.clientX-r.left)/r.width*st.srcW,(e.clientY-r.top)/r.height*st.srcH]);
-    const dot=document.createElement('div');dot.style.cssText=`position:absolute;z-index:4;width:14px;height:14px;margin:-7px;border-radius:50%;background:#D93B83;border:2px solid #fff;left:${e.clientX-sr.left}px;top:${e.clientY-sr.top}px;pointer-events:none`;stage.appendChild(dot);dots.push(dot);
+    const dot=document.createElement('div');dot.style.cssText=`position:absolute;z-index:4;width:14px;height:14px;margin:-7px;border-radius:50%;background:#ff5d5b;border:2px solid #fff;left:${e.clientX-sr.left}px;top:${e.clientY-sr.top}px;pointer-events:none`;stage.appendChild(dot);dots.push(dot);
     if(st.manual.length===4){const m=st.manual,cx=m.reduce((s,p)=>s+p[0],0)/4,cy=m.reduce((s,p)=>s+p[1],0)/4;m.sort((a,b)=>Math.atan2(a[1]-cy,a[0]-cx)-Math.atan2(b[1]-cy,b[0]-cx));st.manual=null;setTimeout(()=>{dots.forEach(d=>d.remove());dots.length=0;},600);autoYaw=null;usePose(m,'Corners set');}
     else say(`Corner ${st.manual.length} of 4`,'warn');});
 }
