@@ -91,8 +91,9 @@ const mesh=(g,m,p,r)=>{const o=new THREE.Mesh(g,m);if(p)o.position.set(...p);if(
 const CHARS={
  outlaw:{name:'Pistolwhisker',cls:'Gunslinger',head:[.05,1.74,0],hatY:1.8,face:[.1,1.75,.12],backC:[.0,1.22,-.2],hipL:[-.21,.97,.04],hipR:[.21,.97,.04],shL:[-.22,1.41,-.01],belt:[.02,1.0,.02,1.1,.95],halo:2.02,spine:[0,1.5,-.19]},
  vigilante:{name:'Vigilante',cls:'Gunslinger',head:[.07,1.69,-.03],hatY:1.8,face:[.11,1.72,.1],backC:[.06,1.28,-.3],hipL:[-.18,.97,0],hipR:[.38,.97,0],shL:[.3,1.44,0],belt:[.12,1.0,-.02,1.45,1.05],halo:2.04,spine:[.06,1.55,-.27]}};
-let charId=GN.store.get('char','outlaw');if(!GN.chars.get(charId))charId='outlaw';
+let charId=GN.store.get('char','outlaw');if(!GN.chars.get(charId))charId=GN.chars.first();
 let A=CHARS[charId]||CHARS.outlaw;
+GN.chars.on(()=>{if(!GN.chars.get(charId)&&GN.loChar)GN.loChar(GN.chars.first());});
 function build(slot,id){
   const g=new THREE.Group();
   if(slot==='head'){
@@ -195,9 +196,9 @@ GN.loStart=()=>{t0=performance.now();requestAnimationFrame(loop);};GN.loStart();
 }
 
 const CLS={gunslinger:'Gunslinger',brawler:'Brawler',tech:'Tech-Slinger',ghost:'Ghost',sniper:'Sniper'};
-function renderChars(){const el=$('#lo-chars');if(!el)return;const sel=GN.store.get('char','outlaw');
+function renderChars(){const el=$('#lo-chars');if(!el)return;let sel=GN.store.get('char','outlaw');if(!GN.chars.get(sel)){sel=GN.chars.first();GN.store.set('char',sel);}
   el.innerHTML=GN.chars.list().map(c=>`<button data-c="${GN.esc(c.id)}" class="${c.id===sel?'on-t':''}" aria-pressed="${c.id===sel}">${GN.esc(c.name)}${c.builtin?'':' ★'}</button>`).join('')+'<button class="b-gold" data-up="1">+ Upload</button>';
-  const c=GN.chars.get(sel);const d=$('#lo-del');if(d)d.hidden=!c||c.builtin;}
+}
 GN.chars.on(renderChars);renderChars();
 $('#lo-chars').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.up){uploadDialog();return;}
@@ -221,9 +222,22 @@ function uploadDialog(){
       }catch(err){c.querySelector('#up-err').textContent=err.message||'Upload failed.';ok.disabled=false;ok.textContent='Add character';}});
   });
 }
-$('#lo-del').addEventListener('click',()=>{const id=GN.store.get('char','outlaw'),c=GN.chars.get(id);if(!c||c.builtin)return;
-  GN.modal(`<h2 id="md-t" class="cond" style="color:var(--gold)">Remove ${GN.esc(c.name)}?</h2><p class="sub" style="margin:0">The uploaded file is deleted from this device. Built-in miniatures stay.</p><div class="g2"><button data-close>Keep</button><button class="b-gold" id="del-ok">Remove</button></div>`,(m,close)=>{
-    m.querySelector('#del-ok').addEventListener('click',async()=>{await GN.chars.remove(id);close();GN.store.set('char','outlaw');renderChars();if(GN.loChar)GN.loChar('outlaw');GN.toast(`${c.name} removed.`);});});});
+function manage(){
+  const all=GN.chars.list(),hc=GN.chars.hiddenCount(),one=all.length<=1;
+  GN.modal(`<h2 id="md-t" class="cond" style="color:var(--gold)">Manage characters</h2>
+   <p class="sub" style="margin:0">Remove the ones you don't need. Uploaded characters are deleted from this device; built-in miniatures are only hidden and can be restored.</p>
+   <div class="list" id="mg-list">${all.map(c=>`<div><span class="av" style="background:var(--panel2);color:var(--gold)">${GN.esc(c.name.split(' ').map(w=>w[0]).join('').slice(0,2))}</span><div style="flex:1"><b>${GN.esc(c.name)}</b><div class="sub">${c.builtin?'Built-in':'Uploaded'+(c.size?` · ${(c.size/1e6).toFixed(1)} MB`:'')} · ${CLS[c.cls]||c.cls}</div></div><button class="b-gold" data-rm="${GN.esc(c.id)}" ${one?'disabled':''} style="min-height:40px">Remove</button></div>`).join('')}</div>
+   ${one?'<p class="sub" style="margin:0">Keep at least one character.</p>':''}
+   <div class="g2">${hc?`<button class="b-out" id="mg-restore">Restore built-in (${hc})</button>`:'<span></span>'}<button data-close>Done</button></div>`,(m,close)=>{
+    m.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',()=>{const c=GN.chars.get(b.dataset.rm);if(!c)return;
+      const yes=m.querySelector('#mg-yes');if(yes&&yes.dataset.id===c.id){return;}
+      b.outerHTML=`<span style="display:flex;gap:6px"><button data-no style="min-height:40px">Keep</button><button class="b-gold" id="mg-yes" data-id="${GN.esc(c.id)}" style="min-height:40px">${c.builtin?'Hide':'Delete'}</button></span>`;
+      m.querySelector('[data-no]').addEventListener('click',()=>{close();manage();});
+      m.querySelector('#mg-yes').addEventListener('click',async()=>{try{await GN.chars.remove(c.id);close();renderChars();if(GN.loChar)GN.loChar(GN.store.get('char',GN.chars.first()));GN.toast(c.builtin?`${c.name} hidden. Restore it any time.`:`${c.name} deleted.`);manage();}catch(err){GN.toast(err.message);}});}));
+    const r=m.querySelector('#mg-restore');if(r)r.addEventListener('click',()=>{GN.chars.restore();close();renderChars();GN.toast('Built-in miniatures restored.');manage();});
+  });
+}
+$('#lo-del').addEventListener('click',manage);
 GN.loadoutSet=(slotId,id)=>{cur[slotId]=id;try{localStorage.setItem('gn-loadout',JSON.stringify(cur));}catch(e){}renderUI();apply();};
 GN.register('loadout',{show(){visible=true;if(!started)init3d();else if(GN.loStart)GN.loStart();},hide(){visible=false;}});
 }

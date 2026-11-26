@@ -32,9 +32,17 @@ async function add(file,name,cls){
   if(ok===null){mem[id]=data;}
   custom.push({id,name:rec.name,cls,builtin:false,size:file.size});emit();return {id,saved:ok!==null};
 }
-async function remove(id){await tx('readwrite',s=>s.delete(id));delete mem[id];delete bufCache[id];custom=custom.filter(c=>c.id!==id);emit();}
-function list(){return BUILTIN.concat(custom);}
+const hidden=()=>GN.store.get('hiddenChars',[]);
+async function remove(id){
+  if(list().length<=1)throw new Error('Keep at least one character.');
+  if(BUILTIN.some(c=>c.id===id)){const h=hidden();if(!h.includes(id))h.push(id);GN.store.set('hiddenChars',h);}
+  else{await tx('readwrite',s=>s.delete(id));delete mem[id];delete bufCache[id];custom=custom.filter(c=>c.id!==id);}
+  if(GN.store.get('char','outlaw')===id)GN.store.set('char',list()[0].id);
+  emit();}
+function restore(){GN.store.set('hiddenChars',[]);emit();}
+function list(){const h=hidden();return BUILTIN.filter(c=>!h.includes(c.id)).concat(custom);}
 function get(id){return list().find(c=>c.id===id);}
+function first(){return list()[0].id;}
 /* ---- shared model helpers ---- */
 // Normalise any model: feet on y=0, body centred on its feet (not on an outstretched gun), height 1.9
 function normalise(scene){
@@ -66,6 +74,6 @@ function anchors(root){
     hipL:[hl,.51*H,wz],hipR:[hr,.51*H,wz],shL:[q(sh,0,.85),.755*H,q(sh,2,.5)],belt:[wx,.525*H,wz,Math.max(.8,wrx/.2),Math.max(.8,wrz/.2)],halo:1.07*H,spine:[hx,.82*H,q(back,2,.06)]};
 }
 function parse(buf){return new Promise((res,rej)=>new THREE.GLTFLoader().parse(buf.slice(0),'',g=>res(g.scene),rej));}
-GN.chars={list,get,add,remove,buffer,parse,normalise,anchors,on(f){subs.push(f);},MAXMB};
+GN.chars={list,get,first,add,remove,restore,hiddenCount:()=>hidden().length,buffer,parse,normalise,anchors,on(f){subs.push(f);},MAXMB};
 loadList();
 })();
