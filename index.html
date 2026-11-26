@@ -247,7 +247,7 @@ window.GNSplash={hide:hide};})();
         <a class="cta ar" href="#ar"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#32d6d0" stroke-width="2" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg><div><b style="color:var(--teal)">AR Playground</b><div class="sub" style="color:#bde6e3">Put the board on your table</div></div></a>
         <a class="cta live" href="#live"><div class="cond" style="font-size:13px;color:var(--magl)"><span class="live-dot"></span>Live · <span id="h-viewers">12</span> watching</div><div><b style="color:var(--magl)">Watch Live Match</b><div class="sub" style="color:#f3c2bf">Zone War: Drone Hub</div></div></a>
       </div>
-      <a class="map" href="#maps" id="h-map" style="display:block;background:radial-gradient(circle at 50% 50%,#3a2a3e,#1b1119)"><img id="h-mapimg" src="map-dryridge.webp" alt="" style="aspect-ratio:auto;height:240px;object-fit:contain;padding:10px"><span class="tag">Corporation holds 6 of 11 zones</span><span class="tag" id="h-mapname" style="top:auto;bottom:10px;background:#241923e6;border-color:var(--gold);color:var(--gold)">Skirmish map: Dryridge · change ›</span></a>
+      <a class="map" href="#maps" id="h-map" style="display:block;background:radial-gradient(circle at 50% 50%,#3a2a3e,#1b1119)"><img id="h-mapimg" src="map-dryridge.webp" alt="" style="aspect-ratio:auto;height:240px;object-fit:contain;padding:10px"><span class="tag" id="h-mapname" style="top:auto;bottom:10px;background:#241923e6;border-color:var(--gold);color:var(--gold)">Skirmish map: Dryridge · change ›</span></a>
       <div class="card bounty col" style="gap:8px">
         <div class="vh" style="margin:0"><span class="cond" style="font-size:14px;color:var(--gold)">/// Bounty on your head ///</span><span class="sub" style="color:#e0c995">2 d 14 h left</span></div>
         <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span class="amt">45 cr</span><span>set by Copper Sentinel</span></div>
@@ -273,7 +273,7 @@ window.GNSplash={hide:hide};})();
       <div class="g3">
         <a class="btn" href="#gear" style="min-height:72px;flex-direction:column;gap:2px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c6a15b" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Inventory</a>
         <a class="btn" href="#trophies" style="min-height:72px;flex-direction:column;gap:2px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c6a15b" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/></svg>Trophies</a>
-        <a class="btn" href="#loadout" style="min-height:72px;flex-direction:column;gap:2px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c6a15b" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg>Loadout</a>
+        <a class="btn" href="#hero" style="min-height:72px;flex-direction:column;gap:2px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c6a15b" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg>Loadout</a>
       </div>
       <div class="card feed"><span class="cond" style="color:var(--teal);flex:none">Frontier feed</span><span class="sub" id="h-feed">Caravan job in Dryridge · New bounties posted</span></div>
     </div>
@@ -291,7 +291,7 @@ window.GNSplash={hide:hide};})();
       <div id="ar-tray" hidden title="Tap to roll again"></div>
     </div>
     <div class="col">
-      <div class="card"><h2 style="margin-bottom:8px">Miniature</h2><div class="row" id="ar-pick" role="group" aria-label="Miniature"></div><a class="cond" href="#loadout" style="display:inline-block;margin-top:8px;font-size:14px">Upload your own character ›</a></div>
+      <div class="card"><h2 style="margin-bottom:8px">Miniature</h2><div class="row" id="ar-pick" role="group" aria-label="Miniature"></div><a class="cond" href="#hero" style="display:inline-block;margin-top:8px;font-size:14px">Upload your own character ›</a></div>
       <div class="card"><h2 style="margin-bottom:8px">Board</h2><div class="row" id="ar-maps" role="group" aria-label="Board projected on the sheet"></div>
         <label class="r">Board size <span id="ar-bv">300 mm</span><input id="ar-bs" type="range" min="150" max="600" value="300"></label>
         <p class="sub" style="margin:4px 0 0;font-size:13px">Tap the board to move your miniature.</p></div>
@@ -348,7 +348,7 @@ window.GNSplash={hide:hide};})();
 
 <!-- GEAR -->
 <section class="view" id="v-gear" aria-label="Inventory">
-  <div class="vh"><h1>Inventory</h1><a href="#loadout" class="cond">3D loadout ›</a></div>
+  <div class="vh"><h1>Inventory</h1><a href="#hero" class="cond">Hero ›</a></div>
   <div class="grid2" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)">
     <div class="col">
       <div class="card col" id="g-class" style="gap:12px"></div>
@@ -374,28 +374,24 @@ window.GNSplash={hide:hide};})();
 </section>
 
 <!-- HERO -->
-<section class="view" id="v-hero" aria-label="Character">
-  <div class="vh"><h1>Character</h1><a class="cond" href="#loadout">3D loadout ›</a></div>
+<section class="view" id="v-hero" aria-label="Hero">
+  <div class="vh" style="flex-wrap:wrap"><h1>Hero</h1><button id="lo-del" class="b-out" style="min-height:38px">Manage miniatures</button></div>
   <div class="row" id="hr-heroes" role="group" aria-label="Your characters" style="margin-bottom:12px"></div>
-  <div class="grid2">
-    <div class="col"><div class="card col" id="hr-top" style="gap:12px"></div><div class="card col" id="hr-attr" style="gap:10px"></div><div class="card col" id="hr-class" style="gap:10px"></div></div>
-    <div class="card col" id="hr-tree" style="gap:10px"></div>
+  <div class="grid2" style="grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)">
+    <div class="col">
+      <div id="lo-view"><div id="lo-cam"><button id="lo-spin" class="on-t">Turntable</button><button data-cam="full">Full</button><button data-cam="head">Head</button><button data-cam="back">Back</button></div><div id="lo-load">Loading miniature…</div></div>
+      <div class="card col" id="hr-top" style="gap:12px"></div>
+      <div class="card col" id="hr-equip" style="gap:8px"></div>
+      <div class="card col" style="gap:8px"><h2>Look</h2><p class="sub" style="margin:0;font-size:13px">Weapons, implants and armour on the miniature come from your equipped gear. Pick the cosmetic parts here.</p>
+        <div class="tabs" id="lo-tabs" role="tablist"></div><div><h3 class="cond" id="lo-name" style="font-size:18px"></h3><p class="sub" id="lo-desc" style="margin:2px 0 8px"></p><div class="opts" id="lo-opts"></div></div>
+        <ul id="lo-sum" style="list-style:none;margin:0;padding:0;display:grid;gap:3px;font-size:14px"></ul>
+        <div class="g2"><button id="lo-rand">Randomize look</button><button id="lo-reset">Reset look</button></div></div>
+    </div>
+    <div class="col"><div class="card col" id="hr-attr" style="gap:10px"></div><div class="card col" id="hr-tree" style="gap:10px"></div><div class="card col" id="hr-class" style="gap:10px"></div></div>
   </div>
 </section>
 
-<!-- LOADOUT -->
-<section class="view" id="v-loadout" aria-label="Loadout">
-  <div class="vh" style="flex-wrap:wrap"><h1>Loadout</h1><div class="row" id="lo-chars" role="group" aria-label="Character"></div><button id="lo-del" class="b-out" style="min-height:38px">Manage miniatures</button></div>
-  <div class="grid2" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
-    <div id="lo-view"><div id="lo-cam"><button id="lo-spin" class="on-t">Turntable</button><button data-cam="full">Full</button><button data-cam="head">Head</button><button data-cam="back">Back</button></div><div id="lo-load">Loading miniature…</div></div>
-    <div class="col">
-      <div class="tabs" id="lo-tabs" role="tablist"></div>
-      <div><h2 class="cond" id="lo-name" style="font-size:20px"></h2><p class="sub" id="lo-desc" style="margin:2px 0 10px"></p><div class="opts" id="lo-opts"></div></div>
-      <div class="card"><h3 class="cond sub" style="font-size:14px;margin-bottom:6px">Current loadout</h3><ul id="lo-sum" style="list-style:none;margin:0;padding:0;display:grid;gap:3px;font-size:15px"></ul></div>
-      <div class="g3"><button id="lo-rand">Randomize</button><button id="lo-reset">Reset</button><button id="lo-save" class="b-gold">Save</button></div>
-    </div>
-  </div>
-</section>
+
 </main>
 
 <nav class="nav" aria-label="Main">

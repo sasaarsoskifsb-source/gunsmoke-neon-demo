@@ -29,25 +29,27 @@ const IT=[
  {id:'emp',t:'weapon',wt:'Sniper',n:'EMP Rifle',r:'epic',fit:['sniper','tech'],st:[['Dice','2D6'],['Range','4–8 hex'],['Hit','4+'],['Damage','1']],fx:'Short-circuit: a hit target loses its cyberware effects and reaction until the end of next round. Drones hit are disabled.',src:'Looted from the Orbital Armory.',lore:'Fires a charge, not a bullet.',p:18,lo:['back','rifle']},
  {id:'rocket',t:'weapon',wt:'Rocket',n:'Hellfire Launcher',r:'epic',fit:['brawler'],st:[['Dice','1D6'],['Range','3–7 hex'],['Hit','3+ on the target hex'],['Damage','3, plus 1 to every adjacent hex']],fx:'Blast hits allies too. Reload: after firing you must spend an action to reload. Heavy: carrier moves 1 hex less.',src:'Mission reward: Convoy through the desert.',lore:'One shot, one crater.',p:24,lo:['back','rocket']},
  // CYBERWARE: 3 slots, Neural Load 6 (Tech-Slinger 8)
- {id:'cyberreflex',t:'cyber',n:'Cyber-Reflex',r:'rare',load:2,fit:['ghost','gunslinger'],fx:'Dodge with 2D6 and keep the better die.',src:'Implanted at the Neon Mesa clinic for 10 cr.',lore:'Spinal accelerator, twitchy in the rain.',p:10},
- {id:'jetboost',t:'cyber',n:'Jet Boost',r:'rare',load:1,fit:['brawler','gunslinger'],fx:'Movement +1 and sprint +1.',src:'Bought at the Black Market for 6 cr.',lore:'Calf thrusters, leave scorch marks.',p:6,lo:['back','jetpack']},
- {id:'cybereyes',t:'cyber',n:'Cyber Eyes',r:'rare',load:1,fit:['sniper'],fx:'Aim still works after moving 1 hex. Pistols get +1 range.',src:'Looted from the Sabotage match at Drone Hub.',lore:'Teal optics with a range finder.',p:6,lo:['cyber','eye']},
- {id:'neural',t:'cyber',n:'Neural Prediction',r:'epic',load:2,fit:['tech','sniper'],fx:'Once per round, reroll one of your own dice.',src:'Mission reward: Two teams, one Data Vault.',lore:'Guesses your next move before you do.',p:14,lo:['cyber','spine']},
- {id:'plasma',t:'cyber',n:'Plasma Shield',r:'legendary',load:3,fit:['brawler','tech'],fx:'Reaction, once per mission: cancel up to 2 hits from one attack.',src:'Looted from the Orbital Station Armory.',lore:'Shoulder emitter, smells of ozone.',p:24,lo:['shoulder','shield']},
- {id:'camo',t:'cyber',n:'Adaptive Camouflage',r:'epic',load:2,fit:['ghost'],fx:'+1 to dodge while in cover (dodge never better than 2+).',src:'Bought from a Shadow Syndicate fence for 12 cr.',lore:'Skin weave that copies the wall behind you.',p:12},
- {id:'subdermal',t:'cyber',n:'Subdermal Armor',r:'rare',load:2,fit:['brawler'],fx:'Gives the Ricochet Shield reaction: cancel one hit on 4+. Movement −1.',src:'Starting implant of every Brawler.',lore:'Plates under the skin.',p:8,lo:['shoulder','pauldron']},
- {id:'titanium',t:'cyber',n:'Titanium Arms',r:'rare',load:2,fit:['brawler'],fx:'Melee attacks deal +1 damage. Your unarmed Strike rolls 2D6.',src:'Bought at the Plant foundry for 10 cr.',lore:'Knuckles that dent doors.',p:10},
- {id:'berserker',t:'cyber',n:'Berserker Chip',r:'epic',load:3,fit:['brawler'],fx:'Below half HP: +1 attack die, but −1 to your dodge.',src:'Looted from a Rust Jack duel.',lore:'Bans fear, also bans caution.',p:14},
- {id:'grapple',t:'cyber',n:'Grappling Hook',r:'rare',load:1,fit:['ghost','sniper'],fx:'Action: move up to 4 hexes in a straight line, over crates. Once per round.',src:'Bought at the Train Station for 7 cr.',lore:'Wrist reel, 20 m of wire.',p:7},
- {id:'overclock',t:'cyber',n:'Overclock Legs',r:'epic',load:2,fit:['gunslinger','ghost'],fx:'Sprint 7 hexes. After an overclocked sprint roll 1D6: on a 1 you take 1 damage.',src:'Mission reward: Neon Kid duel.',lore:'Runs hot, runs fast.',p:12},
+ {id:'cyberreflex',t:'cyber',cls:['gunslinger','brawler','tech','ghost','sniper'],n:'Cyber-Reflex',r:'rare',load:2,fit:['ghost','gunslinger'],fx:'Dodge with 2D6 and keep the better die.',src:'Implanted at the Neon Mesa clinic for 10 cr.',lore:'Spinal accelerator, twitchy in the rain.',p:10},
+ {id:'jetboost',t:'cyber',cls:['gunslinger','brawler','tech','ghost','sniper'],n:'Jet Boost',r:'rare',load:1,fit:['brawler','gunslinger'],fx:'Movement +1 and sprint +1.',src:'Bought at the Black Market for 6 cr.',lore:'Calf thrusters, leave scorch marks.',p:6,lo:['back','jetpack']},
+ {id:'cybereyes',t:'cyber',cls:['gunslinger','ghost','sniper'],n:'Cyber Eyes',r:'rare',load:1,fit:['sniper'],fx:'Aim still works after moving 1 hex. Pistols get +1 range.',src:'Looted from the Sabotage match at Drone Hub.',lore:'Teal optics with a range finder.',p:6,lo:['cyber','eye']},
+ {id:'neural',t:'cyber',cls:['gunslinger','tech','sniper'],n:'Neural Prediction',r:'epic',load:2,fit:['tech','sniper'],fx:'Once per round, reroll one of your own dice.',src:'Mission reward: Two teams, one Data Vault.',lore:'Guesses your next move before you do.',p:14,lo:['cyber','spine']},
+ {id:'plasma',t:'cyber',cls:['brawler','tech'],n:'Plasma Shield',r:'legendary',load:3,fit:['brawler','tech'],fx:'Reaction, once per mission: cancel up to 2 hits from one attack.',src:'Looted from the Orbital Station Armory.',lore:'Shoulder emitter, smells of ozone.',p:24,lo:['shoulder','shield']},
+ {id:'camo',t:'cyber',cls:['ghost','sniper'],n:'Adaptive Camouflage',r:'epic',load:2,fit:['ghost'],fx:'+1 to dodge while in cover (dodge never better than 2+).',src:'Bought from a Shadow Syndicate fence for 12 cr.',lore:'Skin weave that copies the wall behind you.',p:12},
+ {id:'subdermal',t:'cyber',cls:['brawler'],n:'Subdermal Armor',r:'rare',load:2,fit:['brawler'],fx:'Gives the Ricochet Shield reaction: cancel one hit on 4+. Movement −1.',src:'Starting implant of every Brawler.',lore:'Plates under the skin.',p:8,lo:['shoulder','pauldron']},
+ {id:'titanium',t:'cyber',cls:['brawler'],n:'Titanium Arms',r:'rare',load:2,fit:['brawler'],fx:'Melee attacks deal +1 damage. Your unarmed Strike rolls 2D6.',src:'Bought at the Plant foundry for 10 cr.',lore:'Knuckles that dent doors.',p:10},
+ {id:'berserker',t:'cyber',cls:['brawler'],n:'Berserker Chip',r:'epic',load:3,fit:['brawler'],fx:'Below half HP: +1 attack die, but −1 to your dodge.',src:'Looted from a Rust Jack duel.',lore:'Bans fear, also bans caution.',p:14},
+ {id:'grapple',t:'cyber',cls:['tech','ghost','sniper'],n:'Grappling Hook',r:'rare',load:1,fit:['ghost','sniper'],fx:'Action: move up to 4 hexes in a straight line, over crates. Once per round.',src:'Bought at the Train Station for 7 cr.',lore:'Wrist reel, 20 m of wire.',p:7},
+ {id:'overclock',t:'cyber',cls:['gunslinger','brawler','ghost'],n:'Overclock Legs',r:'epic',load:2,fit:['gunslinger','ghost'],fx:'Sprint 7 hexes. After an overclocked sprint roll 1D6: on a 1 you take 1 damage.',src:'Mission reward: Neon Kid duel.',lore:'Runs hot, runs fast.',p:12},
+ {id:'holodecoy',t:'cyber',cls:['tech','ghost','sniper'],n:'Holo-Decoy',r:'rare',load:2,fit:['ghost','sniper'],fx:'Reaction: the first hit of an attack goes to a hologram.',src:'Bought from a Shadow Syndicate fence for 7 cr.',lore:'A flicker of you, one step to the left.',p:7},
+ {id:'feign',t:'cyber',cls:['gunslinger','brawler','tech','ghost','sniper'],n:'Feign Death',r:'epic',load:2,fit:['ghost','gunslinger'],fx:'When you would be downed, vanish and return next turn within 2 hexes at 1 HP. Once per mission.',src:'Looted from the Smuggler Cache.',lore:'Stops your heart for six seconds.',p:9},
  // CONSUMABLES: any number owned, pack up to 4 into a mission
  {id:'nanoheal',t:'consumable',n:'Nano Heal',r:'common',fit:['brawler','gunslinger','tech','ghost','sniper'],fx:'Action: heal 3 HP. Can target an ally next to you.',src:'Bought at the Saloon for 3 cr.',lore:'A syringe of hungry machines.',p:3},
  {id:'granate',t:'consumable',n:'Granate',r:'rare',fit:['brawler','tech'],fx:'Throw up to 3 hexes: 1D6 per unit on and next to the target hex, hit on 4+, damage 1.',src:'Looted from a Corporation drone crate.',lore:'Pin, count, pray.',p:4},
  {id:'smoke',t:'consumable',n:'Smoke Grenade',r:'common',fit:['ghost','sniper'],fx:'Throw up to 3 hexes: that hex and its neighbours give heavy cover against ranged attacks until the end of the round.',src:'Bought at the Black Market for 3 cr.',lore:'Desert-grey cloud.',p:3},
  {id:'stim',t:'consumable',n:'Stim Shot',r:'common',fit:['gunslinger','brawler'],fx:'Free: +2 movement this turn.',src:'Bought at the Saloon for 2 cr.',lore:'Burns going in.',p:2},
- {id:'empnade',t:'consumable',n:'EMP Grenade',r:'rare',fit:['tech'],fx:'Throw up to 3 hexes: drones disabled and cyberware switched off within 1 hex until the end of next round.',src:'Looted from the Drone Hub war.',lore:'Quiet flash, loud consequences.',p:5},
+ {id:'empnade',t:'consumable',cls:['tech','brawler','gunslinger'],n:'EMP Grenade',r:'rare',fit:['tech'],fx:'Throw up to 3 hexes: drones disabled and cyberware switched off within 1 hex until the end of next round.',src:'Looted from the Drone Hub war.',lore:'Quiet flash, loud consequences.',p:5},
  {id:'flash',t:'consumable',n:'Flashbang',r:'common',fit:['brawler','tech'],fx:'Throw up to 3 hexes: everyone within 1 hex loses their reaction this round.',src:'Bought at the Black Market for 3 cr.',lore:'Ears ring till sunrise.',p:3},
- {id:'spike',t:'consumable',n:'Hack Spike',r:'rare',fit:['tech'],fx:'One door, drone or terminal hack succeeds automatically.',src:'Mission reward: Sabotage at the Plant.',lore:'Single-use exploit on a stick.',p:5},
+ {id:'spike',t:'consumable',cls:['tech','ghost'],n:'Hack Spike',r:'rare',fit:['tech'],fx:'One door, drone or terminal hack succeeds automatically.',src:'Mission reward: Sabotage at the Plant.',lore:'Single-use exploit on a stick.',p:5},
  {id:'patch',t:'consumable',n:'Armor Patch',r:'common',fit:['brawler','gunslinger','tech','ghost','sniper'],fx:'Reaction: ignore 1 damage from one attack.',src:'Bought at the Saloon for 3 cr.',lore:'Spray-on ceramic.',p:3},
  {id:'knives',t:'consumable',n:'Throwing Knives',r:'common',fit:['ghost','gunslinger'],fx:'Throw one: 1D6, range 1–3, hit on 4+, damage 1. Does not use your weapon.',src:'Bought at the Train Station for 1 cr each.',lore:'Balanced for the wrist.',p:1,lo:['weapon','knives']},
  // LOOT: unlimited, earned by winning matches, always active, duplicates do not stack
@@ -60,6 +62,11 @@ const IT=[
  {id:'fang',t:'loot',n:"Jackal's Fang",r:'rare',fit:['brawler'],fx:'Melee: a natural 6 on your attack deals +1 damage.',src:'Won: Zone War vs Iron Jackal (victory, 9 Nov).',lore:'Pulled from a chrome jaw.'},
  {id:'keycard',t:'loot',n:'Orbital Keycard',r:'legendary',fit:['tech','ghost'],fx:'Unlocks Orbital Station story missions in the mission generator.',src:'Won: Sabotage of the Orbital Station (victory, 3 Nov).',lore:'Still warm from the docking bridge.'}];
 const byId=id=>IT.find(i=>i.id===id);
+const ALL=['gunslinger','brawler','tech','ghost','sniper'];
+const WTYPES={gunslinger:['Pistol','Shotgun','SMG'],brawler:['Melee','Shotgun','Rocket'],tech:['SMG','Pistol','Shotgun'],ghost:['Melee','Pistol','SMG'],sniper:['Sniper','Pistol']};
+const allowedCls=i=>i.t==='weapon'?ALL.filter(c=>WTYPES[c].includes(i.wt)):(i.cls||ALL);
+const allowed=(i,c)=>allowedCls(i).includes(c);
+const START={gunslinger:{weapon:'revolver',cyber:['cyberreflex']},brawler:{weapon:'katana',cyber:['subdermal']},tech:{weapon:'smg',cyber:['neural']},ghost:{weapon:'katana',cyber:['camo']},sniper:{weapon:'sniper',cyber:['cybereyes']}};
 const RC={common:'#b5a7b4',rare:'#32d6d0',epic:'#ff8f8d',legendary:'#c6a15b'};
 const TYPE={weapon:'Weapon',cyber:'Cyberware',consumable:'Consumable',loot:'Loot'};
 const TI={weapon:'<path d="M3 9h14l2-2h2v4h-4l-1 2h-3l-1 4H8l1-4H3z"/>',Melee:'<path d="M5 19L18 6l1-3 2 2-3 1L5 19l-1 2-2-2z"/>',Rocket:'<path d="M3 14l11-11h4v4L7 18zM6 14l4 4M3 21l3-3"/>',cyber:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>',consumable:'<path d="M9 2h6M10 2v5l-5 9a3 3 0 0 0 3 4h8a3 3 0 0 0 3-4l-5-9V2"/>',loot:'<path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/>'};
@@ -67,12 +74,18 @@ const tIcon=i=>TI[i.wt]||TI[i.t];
 /* ---------- state ---------- */
 if(!st.g)st.g={own:{revolver:1,katana:1,smg:1,sniper:1,rocket:1,heavyrev:1,shotgun:1,ekatana:1,emp:1,cyberreflex:1,jetboost:1,cybereyes:1,neural:1,plasma:1,camo:1,subdermal:1,grapple:1,overclock:1,nanoheal:3,granate:2,smoke:2,stim:4,empnade:1,flash:2,spike:1,patch:2,knives:6,aicore:1,star:1,lucky:1,ghostcoat:1,compass:1,ledger:1,fang:1,keycard:1},weapon:'revolver',cyber:['cyberreflex','jetboost'],pack:['nanoheal','granate','stim']};
 const G=st.g;
+['titanium','berserker','holodecoy','feign'].forEach(id=>{if(G.own[id]===undefined)G.own[id]=1;});
+function startGear(cls){const s=START[cls];[s.weapon,...s.cyber].forEach(id=>{if(!G.own[id])G.own[id]=1;});save();return{weapon:s.weapon,cyber:s.cyber.slice(),pack:['nanoheal','stim'].filter(id=>G.own[id])};}
+const HG=()=>{const h=GN.hero.active();if(!h.gear){h.gear=h.id==='h1'&&G.weapon?{weapon:G.weapon,cyber:G.cyber.slice(),pack:G.pack.slice()}:startGear(h.cls);GN.hero.save();}return h.gear;};
+const saveAll=()=>{save();GN.hero.save();GN.hero.refresh();};
+GN.gear={byId,allowed,allowedCls,startGear,HG:()=>HG(),WTYPES};
 const myClass=()=>GN.hero?GN.hero.active().cls:'gunslinger';
 const loadCap=()=>GN.hero?GN.hero.stats(GN.hero.active()).nl:6;
-const loadUsed=()=>G.cyber.reduce((s,id)=>s+(byId(id).load||0),0);
+const loadUsed=()=>HG().cyber.reduce((s,id)=>s+(byId(id).load||0),0);
 const SLOTS=3;let PACK=4;
 let filter='all',sel='plasma',clsF=null;
-function rulesFor(i){
+function rulesFor(i){const cl=' · Classes: '+allowedCls(i).map(c=>CLASSES[c].n).join(', ');return rulesFor0(i)+(i.t==='loot'?'':cl);}
+function rulesFor0(i){
   if(i.t==='weapon')return `${i.wt} · one weapon equipped at a time`;
   if(i.t==='cyber')return `Neural Load ${i.load} · max ${SLOTS} implants and ${loadCap()} load`;
   if(i.t==='consumable')return `Stock unlimited · pack up to ${PACK} into a mission`;
@@ -81,31 +94,34 @@ function rulesFor(i){
 function render(){
   PACK=GN.hero?GN.hero.stats(GN.hero.active()).pack:4;
   const mc=myClass();
-  $('#g-class').innerHTML=`<div style="display:flex;gap:12px;align-items:center">${icon(mc,56,true)}<div style="flex:1"><div class="cond" style="font-size:13px;color:var(--mute)">${GN.hero?esc(GN.hero.active().name)+' · ':''}class locked</div><div class="disp" style="font-size:28px;line-height:1.05;color:${CLASSES[mc].c}">${CLASSES[mc].n}</div><div class="sub">${esc(CLASSES[mc].p)}</div></div></div>
-   <div class="cls-row" role="group" aria-label="Show gear that fits a class">${Object.keys(CLASSES).map(k=>`<button data-cls="${k}" class="${clsF===k?'on-t':''}" aria-pressed="${clsF===k}" title="Gear for ${CLASSES[k].n}">${icon(k,30,true)}<span>${CLASSES[k].n}</span></button>`).join('')}</div>`;
+  const h=GN.hero.active(),S=GN.hero.stats(h),Lv=GN.hero.level(h);
+  $('#g-class').innerHTML=`<div style="display:flex;gap:12px;align-items:center">${icon(mc,52)}<div style="flex:1"><div class="disp" style="font-size:28px;line-height:1.05">${esc(h.name)}</div><div class="cond" style="color:${CLASSES[mc].c};font-size:14px">${CLASSES[mc].n} · Level ${Lv} · class locked</div></div><a class="cond" href="#hero" style="font-size:14px">Hero ›</a></div>
+   <div class="g3">${[['HP',S.hp],['Move',S.mv],['Dodge',S.dodge],['Neural Load',S.nlUsed+' / '+S.nl],['Pack',HG().pack.length+' / '+S.pack],['Reactions',S.reacts.length]].map(([a,b])=>`<div class="stat"><b style="font-size:24px">${b}</b><span class="sub" style="font-size:13px">${a}</span></div>`).join('')}</div>
+   <p class="sub" style="margin:0;font-size:13px">Showing only gear a ${CLASSES[mc].n} can use. Weapons: ${WTYPES[mc].join(', ')}.</p>`;
+
   const lu=loadUsed(),lc=loadCap();
-  $('#g-slots').innerHTML=`<div style="border-color:${RC[byId(G.weapon).r]}"><div class="sub" style="font-size:12px">Weapon</div><b style="font-size:14px">${esc(byId(G.weapon).n)}</b></div>`+
-   [0,1,2].map(k=>{const id=G.cyber[k],i=id&&byId(id);return `<div style="${i?'border-color:'+RC[i.r]:'border-style:dashed;color:var(--mute)'}"><div class="sub" style="font-size:12px">Implant ${k+1}</div><b style="font-size:14px">${i?esc(i.n):'Empty'}</b></div>`;}).join('');
+  $('#g-slots').innerHTML=`<div style="border-color:${RC[byId(HG().weapon).r]}"><div class="sub" style="font-size:12px">Weapon</div><b style="font-size:14px">${esc(byId(HG().weapon).n)}</b></div>`+
+   [0,1,2].map(k=>{const id=HG().cyber[k],i=id&&byId(id);return `<div style="${i?'border-color:'+RC[i.r]:'border-style:dashed;color:var(--mute)'}"><div class="sub" style="font-size:12px">Implant ${k+1}</div><b style="font-size:14px">${i?esc(i.n):'Empty'}</b></div>`;}).join('');
   $('#g-meters').innerHTML=`<div><div style="display:flex;justify-content:space-between;font-size:13px"><span class="cond">Neural load</span><span>${lu} / ${lc}</span></div><div class="hp"><i style="width:${100*lu/lc}%;background:${lu>=lc?'var(--mag)':'var(--teal)'}"></i></div></div>
-   <div><div style="display:flex;justify-content:space-between;font-size:13px"><span class="cond">Mission pack</span><span>${G.pack.length} / ${PACK}</span></div><div class="hp"><i style="width:${100*G.pack.length/PACK}%;background:var(--gold)"></i></div><div class="sub" style="font-size:12px;margin-top:3px">${G.pack.length?G.pack.map(id=>esc(byId(id).n)).join(', '):'Nothing packed'}</div></div>
+   <div><div style="display:flex;justify-content:space-between;font-size:13px"><span class="cond">Mission pack</span><span>${HG().pack.length} / ${PACK}</span></div><div class="hp"><i style="width:${100*HG().pack.length/PACK}%;background:var(--gold)"></i></div><div class="sub" style="font-size:12px;margin-top:3px">${HG().pack.length?HG().pack.map(id=>esc(byId(id).n)).join(', '):'Nothing packed'}</div></div>
    <div><div style="display:flex;justify-content:space-between;font-size:13px"><span class="cond">Loot</span><span>${IT.filter(i=>i.t==='loot'&&G.own[i.id]).length} · no limit</span></div><div class="sub" style="font-size:12px">All loot is always active.</div></div>`;
   const CATS=[['all','All'],['weapon','Weapons'],['cyber','Cyberware'],['consumable','Consumables'],['loot','Loot']];
   $('#g-chips').innerHTML=CATS.map(([k,l])=>`<button data-f="${k}" class="${filter===k?'on-t':''}" aria-pressed="${filter===k}">${l}</button>`).join('');
-  const list=IT.filter(i=>G.own[i.id]&&(filter==='all'||i.t===filter)&&(!clsF||i.fit.includes(clsF)));
-  $('#g-items').innerHTML=list.length?list.map(i=>{const eq=G.weapon===i.id||G.cyber.includes(i.id),pk=G.pack.filter(x=>x===i.id).length;
+  const list=IT.filter(i=>G.own[i.id]&&allowed(i,mc)&&(filter==='all'||i.t===filter));
+  $('#g-items').innerHTML=list.length?list.map(i=>{const eq=HG().weapon===i.id||HG().cyber.includes(i.id),pk=HG().pack.filter(x=>x===i.id).length;
     const tag=eq?'Equipped':pk?`Packed ×${pk}`:i.t==='loot'?'Active':i.wt||(i.load?`Load ${i.load}`:TYPE[i.t]);
     return `<button class="it r-${i.r} ${sel===i.id?'sel':''}" data-i="${i.id}" aria-pressed="${sel===i.id}" style="${sel===i.id?'border-color:'+RC[i.r]:''}"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="${RC[i.r]}" stroke-width="1.8" stroke-linejoin="round">${tIcon(i)}</svg><b>${esc(i.n)}</b><small style="${eq||pk?'color:var(--teal)':''}">${tag}</small>${G.own[i.id]>1?`<span class="q">x${G.own[i.id]}</span>`:''}<span class="fits">${i.fit.slice(0,3).map(k=>icon(k,14,false)).join('')}</span></button>`;}).join('')
     :`<p class="sub" style="grid-column:1/-1">Nothing here for this filter.</p>`;
-  if(!G.own[sel])sel=list[0]&&list[0].id;
+  if(!G.own[sel]||!list.some(i=>i.id===sel))sel=list[0]&&list[0].id;
   renderDetail();
 }
 function renderDetail(){
   const i=byId(sel);if(!i){$('#g-detail').innerHTML='';return;}
-  const eq=G.weapon===i.id||G.cyber.includes(i.id),pk=G.pack.filter(x=>x===i.id).length,mc=myClass();
+  const eq=HG().weapon===i.id||HG().cyber.includes(i.id),pk=HG().pack.filter(x=>x===i.id).length,mc=myClass();
   let acts='';
   if(i.t==='weapon')acts=eq?'<button disabled>Equipped</button>':'<button class="b-gold" data-g="equip">Equip weapon</button>';
   if(i.t==='cyber')acts=eq?'<button class="b-out" data-g="unequip">Remove implant</button>':'<button class="b-gold" data-g="equip">Install implant</button>';
-  if(i.t==='consumable')acts=`<button class="b-gold" data-g="pack" ${G.own[i.id]>pk&&G.pack.length<PACK?'':'disabled'}>Pack for mission</button>`+(pk?'<button class="b-out" data-g="unpack">Unpack one</button>':'');
+  if(i.t==='consumable')acts=`<button class="b-gold" data-g="pack" ${G.own[i.id]>pk&&HG().pack.length<PACK?'':'disabled'}>Pack for mission</button>`+(pk?'<button class="b-out" data-g="unpack">Unpack one</button>':'');
   if(i.t==='loot')acts='<button disabled>Always active</button>';
   const sell=i.p&&!eq&&i.t!=='loot'?`<button class="b-out" data-g="sell">Sell · ${Math.round(i.p*.75)} cr</button>`:'';
   const stats=i.st?`<table style="width:100%;border-collapse:collapse;font-size:15px">${i.st.map(([a,b])=>`<tr><td class="sub" style="padding:3px 0;width:40%">${a}</td><td style="padding:3px 0;font-weight:600">${esc(b)}</td></tr>`).join('')}</table>`:'';
@@ -116,21 +132,20 @@ function renderDetail(){
    <div><div class="cond" style="font-size:13px;color:var(--gold)">Rules</div><p class="sub" style="margin:2px 0 0">${esc(rulesFor(i))}</p></div>
    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span class="cond" style="font-size:13px;color:var(--gold)">Best for</span>${i.fit.map(k=>`<span class="fitchip">${icon(k,18,true)}${CLASSES[k].n}</span>`).join('')}${i.fit.includes(mc)?'<span class="sub" style="font-size:13px;color:var(--teal)">fits your class</span>':''}</div>
    <p class="sub" style="margin:0;font-style:italic">${esc(i.lore)}</p>
-   <div class="g2">${acts}${sell}</div>${i.lo?'<a class="cond" href="#loadout" style="font-size:14px">See it on the miniature ›</a>':''}`;
+   <div class="g2">${acts}${sell}</div>${i.lo?'<a class="cond" href="#hero" style="font-size:14px">See it on your miniature ›</a>':''}`;
 }
-$('#g-class').addEventListener('click',e=>{const b=e.target.closest('[data-cls]');if(!b)return;clsF=clsF===b.dataset.cls?null:b.dataset.cls;render();});
 $('#g-chips').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;filter=b.dataset.f;render();});
 $('#g-items').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;sel=b.dataset.i;render();if(innerWidth<820)$('#g-detail').scrollIntoView({behavior:'smooth',block:'start'});});
 $('#g-detail').addEventListener('click',e=>{const b=e.target.closest('[data-g]');if(!b||b.disabled)return;const i=byId(sel),a=b.dataset.g;
-  if(a==='equip'&&i.t==='weapon'){G.weapon=i.id;toast(`${i.n} equipped.`);if(i.lo&&GN.loadoutSet)GN.loadoutSet(i.lo[0],i.lo[1]);}
-  if(a==='equip'&&i.t==='cyber'){if(G.cyber.length>=SLOTS){toast(`All ${SLOTS} implant slots are full. Remove one first.`);return;}
+  if(a==='equip'&&i.t==='weapon'){HG().weapon=i.id;toast(`${i.n} equipped.`);}
+  if(a==='equip'&&i.t==='cyber'){if(HG().cyber.length>=SLOTS){toast(`All ${SLOTS} implant slots are full. Remove one first.`);return;}
     if(loadUsed()+i.load>loadCap()){toast(`Neural Load would be ${loadUsed()+i.load} / ${loadCap()}. Remove an implant first.`);return;}
-    G.cyber.push(i.id);toast(`${i.n} installed.`);if(i.lo&&GN.loadoutSet)GN.loadoutSet(i.lo[0],i.lo[1]);}
-  if(a==='unequip'){G.cyber=G.cyber.filter(x=>x!==i.id);toast(`${i.n} removed.`);}
-  if(a==='pack'){G.pack.push(i.id);toast(`${i.n} packed (${G.pack.length}/${PACK}).`);}
-  if(a==='unpack'){G.pack.splice(G.pack.indexOf(i.id),1);toast(`${i.n} unpacked.`);}
-  if(a==='sell'){GN.addCr(Math.round(i.p*.75));G.own[i.id]--;if(i.t==='consumable'){while(G.pack.filter(x=>x===i.id).length>G.own[i.id])G.pack.splice(G.pack.indexOf(i.id),1);}toast(`Sold ${i.n}.`);}
-  save();render();});
+    HG().cyber.push(i.id);toast(`${i.n} installed.`);}
+  if(a==='unequip'){HG().cyber=HG().cyber.filter(x=>x!==i.id);toast(`${i.n} removed.`);}
+  if(a==='pack'){HG().pack.push(i.id);toast(`${i.n} packed (${HG().pack.length}/${PACK}).`);}
+  if(a==='unpack'){HG().pack.splice(HG().pack.indexOf(i.id),1);toast(`${i.n} unpacked.`);}
+  if(a==='sell'){GN.addCr(Math.round(i.p*.75));G.own[i.id]--;if(i.t==='consumable'){while(HG().pack.filter(x=>x===i.id).length>G.own[i.id])HG().pack.splice(HG().pack.indexOf(i.id),1);}toast(`Sold ${i.n}.`);}
+  saveAll();render();});
 GN.gearItems=IT;
 GN.register('gear',{show:render});
 })();

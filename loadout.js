@@ -51,20 +51,31 @@ const SLOTS=[
 ];
 const DEF={head:'stetson',outfit:'orig',belt:'buckle',weapon:'revolvers',back:'none',shoulder:'none',cyber:'none',base:'hexneon'};
 let cur=Object.assign({},DEF);
-try{const s=JSON.parse(localStorage.getItem('gn-loadout')||'null');if(s)for(const k in DEF)if(s[k]&&SLOTS.find(x=>x.id===k).items.some(i=>i.id===s[k]))cur[k]=s[k];}catch(e){}
+const COS=['head','outfit','belt','base'],LOOK={head:'stetson',outfit:'orig',belt:'buckle',base:'hexneon'};
+// weapons, back gear, shoulder armour and implants on the miniature follow the hero's equipped gear
+function derive(g){const d={weapon:'none',back:'none',shoulder:'none',cyber:'none'};if(!g)return d;
+  const W={revolver:['weapon','revolvers'],heavyrev:['weapon','revolvers'],shotgun:['weapon','shotgun'],smg:['weapon','smg'],katana:['back','katana'],ekatana:['back','katana'],sniper:['back','rifle'],emp:['back','rifle'],rocket:['back','rocket']}[g.weapon];
+  if(W)d[W[0]]=W[1];
+  if(d.weapon==='none'&&g.pack.includes('knives'))d.weapon='knives';
+  if(d.back==='none'&&g.cyber.includes('jetboost'))d.back='jetpack';
+  if(g.cyber.includes('plasma'))d.shoulder='shield';else if(g.cyber.includes('subdermal'))d.shoulder='pauldron';
+  if(g.cyber.includes('cybereyes'))d.cyber='eye';else if(g.cyber.includes('neural'))d.cyber='spine';
+  return d;}
+let curHero=null;
+GN.loSync=h=>{curHero=h;const look=Object.assign({},LOOK,h.look||{});cur=Object.assign({},look,derive(h.gear));renderUI();apply();if(GN.loChar)GN.loChar(h.model);};
+const saveLook=()=>{if(!curHero)return;curHero.look={};COS.forEach(k=>curHero.look[k]=cur[k]);GN.hero.save();};
 let slot='head';
 function renderUI(){
-  $('#lo-tabs').innerHTML=SLOTS.map(s=>`<button role="tab" aria-selected="${s.id===slot}" class="${s.id===slot?'on-t':''}" data-s="${s.id}">${s.name}</button>`).join('');
+  $('#lo-tabs').innerHTML=SLOTS.filter(s=>COS.includes(s.id)).map(s=>`<button role="tab" aria-selected="${s.id===slot}" class="${s.id===slot?'on-t':''}" data-s="${s.id}">${s.name}</button>`).join('');
   const S=SLOTS.find(s=>s.id===slot);$('#lo-name').textContent=S.name;$('#lo-desc').textContent=S.desc;
   $('#lo-opts').innerHTML=S.items.map(i=>`<button class="opt l-${i.r} ${cur[slot]===i.id?'sel':''}" data-i="${i.id}" aria-pressed="${cur[slot]===i.id}"><span class="rt ${i.r}">${i.r}</span><b>${i.n}</b><small>${i.d||'&nbsp;'}</small></button>`).join('');
-  $('#lo-sum').innerHTML=SLOTS.map(s=>{const i=s.items.find(x=>x.id===cur[s.id]);return `<li><span>${s.name}</span><span>${i.n}</span></li>`;}).join('');
+  $('#lo-sum').innerHTML=SLOTS.map(s=>{const i=s.items.find(x=>x.id===cur[s.id])||{n:'—'};return `<li style="display:flex;justify-content:space-between;gap:8px"><span class="sub">${s.name}${COS.includes(s.id)?'':' · gear'}</span><span>${i.n}</span></li>`;}).join('');
 }
 $('#lo-tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;slot=b.dataset.s;renderUI();focusCam(SLOTS.find(s=>s.id===slot).cam);});
-$('#lo-opts').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cur[slot]=b.dataset.i;renderUI();apply();});
+$('#lo-opts').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cur[slot]=b.dataset.i;saveLook();renderUI();apply();});
 const toast=GN.toast;
-$('#lo-rand').addEventListener('click',()=>{for(const s of SLOTS)cur[s.id]=s.items[Math.floor(Math.random()*s.items.length)].id;renderUI();apply();toast('Random loadout rolled.');});
-$('#lo-reset').addEventListener('click',()=>{cur=Object.assign({},DEF);renderUI();apply();toast('Back to the default loadout.');});
-$('#lo-save').addEventListener('click',()=>{let ok=true;try{localStorage.setItem('gn-loadout',JSON.stringify(cur));}catch(e){ok=false;}toast(ok?'Loadout saved on this device.':'Could not save here, the browser blocked storage.');});
+$('#lo-rand').addEventListener('click',()=>{for(const s of SLOTS.filter(x=>COS.includes(x.id)))cur[s.id]=s.items[Math.floor(Math.random()*s.items.length)].id;saveLook();renderUI();apply();toast('Random look rolled.');});
+$('#lo-reset').addEventListener('click',()=>{Object.assign(cur,LOOK);saveLook();renderUI();apply();toast('Look reset.');});
 renderUI();
 
 let started=false,visible=false;
@@ -199,7 +210,7 @@ const CLS={gunslinger:'Gunslinger',brawler:'Brawler',tech:'Tech-Slinger',ghost:'
 function renderChars(){const el=$('#lo-chars');if(!el||!GN.hero)return;const a=GN.hero.active();
   el.innerHTML=GN.hero.list().map(h=>`<button data-hid="${GN.esc(h.id)}" class="${h.id===a.id?'on-t':''}" aria-pressed="${h.id===a.id}">${GN.classIcon(h.cls,18)} ${GN.esc(h.name)}</button>`).join('')+'<a class="btn b-gold" href="#hero">+ New</a>';}
 GN.chars.on(renderChars);setTimeout(renderChars,0);if(GN.hero)GN.hero.on(renderChars);
-$('#lo-chars').addEventListener('click',e=>{const b=e.target.closest('[data-hid]');if(!b)return;GN.hero.setActive(b.dataset.hid);renderChars();});
+{const lc=$('#lo-chars');if(lc)lc.addEventListener('click',e=>{const b=e.target.closest('[data-hid]');if(!b)return;GN.hero.setActive(b.dataset.hid);renderChars();});}
 function uploadDialog(){
   GN.modal(`<h2 id="md-t" class="cond" style="color:var(--gold)">Upload your character</h2>
   <p class="sub" style="margin:0">A .glb file (binary glTF 2.0), standing upright and facing forward (+Z), up to ${GN.chars.MAXMB} MB. Best on phones: under 60k triangles and 2K textures. It stays on this device.</p>
@@ -235,6 +246,6 @@ function manage(){
   });
 }
 $('#lo-del').addEventListener('click',manage);
-GN.loadoutSet=(slotId,id)=>{cur[slotId]=id;try{localStorage.setItem('gn-loadout',JSON.stringify(cur));}catch(e){}renderUI();apply();};
-GN.register('loadout',{show(){renderChars();visible=true;if(!started)init3d();else if(GN.loStart)GN.loStart();},hide(){visible=false;}});
+GN.loShow=()=>{const was=visible;visible=true;if(!started)init3d();else if(!was&&GN.loStart)GN.loStart();};
+GN.loHide=()=>{visible=false;};
 }

@@ -48,12 +48,18 @@ const AMAX=3;
 let H=store.get('heroes',null);
 if(!H){H={active:'h1',list:[{id:'h1',name:'Pistolwhisker',model:'outlaw',cls:'gunslinger',xp:60,attrs:{grit:1,aim:2,reflex:2,tech:1},talents:['quick','noon','fan'],spec:'A',created:Date.now()}]};}
 const saveH=()=>store.set('heroes',H);
+let shown=false;
 const active=()=>H.list.find(h=>h.id===H.active)||H.list[0];
 const level=h=>{let l=1;XPT.forEach((t,i)=>{if(h.xp>=t)l=i+1;});return Math.min(10,l);};
 const attrPts=h=>level(h)-1-Object.values(h.attrs).reduce((a,b)=>a+b,0);
 const talentPts=h=>Math.floor(level(h)/2)-h.talents.length;
-function stats(h){const c=CB[h.cls],t=h.talents;
-  return{hp:c.hp+h.attrs.grit+(t.includes('skin')?2:0),mv:c.mv,nl:c.nl+h.attrs.tech+(t.includes('overclock')?1:0),aim:h.attrs.aim,reflex:h.attrs.reflex,hack:(h.cls==='tech'?1:0)+(h.attrs.tech>=3?1:0),pack:4+(t.includes('smoke')?1:0)};}
+function stats(h){const c=CB[h.cls],t=h.talents,g=h.gear||{weapon:null,cyber:[],pack:[]},has=id=>g.cyber.includes(id),B=GN.gear?GN.gear.byId:()=>null;
+  let mv=c.mv;if(has('jetboost'))mv++;if(!t.includes('unstop')){if(has('subdermal'))mv--;if(g.weapon==='rocket')mv--;}
+  if(h.cls==='ghost'&&t.includes('step'))mv=mv+'*';
+  const reacts=[c.react.split(':')[0]];if(has('subdermal')&&h.cls!=='brawler')reacts.push('Ricochet Shield');if(has('holodecoy')&&h.cls!=='ghost')reacts.push('Holo-Decoy');if(has('plasma'))reacts.push('Plasma Shield');if(has('feign'))reacts.push('Feign Death');
+  const nlUsed=g.cyber.reduce((a,id)=>a+((B(id)||{}).load||0),0);
+  return{hp:c.hp+h.attrs.grit+(t.includes('skin')?2:0),mv,nl:c.nl+h.attrs.tech+(t.includes('overclock')?1:0),nlUsed,aim:h.attrs.aim,reflex:h.attrs.reflex,hack:(h.cls==='tech'?1:0)+(h.attrs.tech>=3?1:0)+(GN.st.g&&GN.st.g.own.aicore?1:0),pack:4+(t.includes('smoke')?1:0),
+    dodge:has('cyberreflex')?'5+ ×2':'5+',reacts,weapon:B(g.weapon)};}
 function canTake(h,T){const L=level(h),[br,tier,id]=T;if(h.talents.includes(id)||talentPts(h)<1)return false;
   if(br==='L')return L>=10;
   if(tier===1)return L>=2;
@@ -63,14 +69,21 @@ function canTake(h,T){const L=level(h),[br,tier,id]=T;if(h.talents.includes(id)|
 function why(h,T){const L=level(h),[br,tier]=T;if(br==='L')return 'Level 10';if(tier===1)return L<2?'Level 2':'';if(tier===2)return L<4?'Level 4':'Needs tier 1';return h.spec&&h.spec!==br?'Other specialization':L<5?'Specialize at level 5':L<6?'Level 6':'Needs tier 2';}
 /* ---------- UI ---------- */
 function render(){
+  if(!active().gear&&GN.gear)GN.gear.HG();
   const h=active(),c=CB[h.cls],C=GN.CLASSES[h.cls],L=level(h),s=stats(h),nx=XPT[L]||null,pv=XPT[L-1];
   $('#hr-heroes').innerHTML=H.list.map(x=>`<button data-h="${esc(x.id)}" class="${x.id===h.id?'on-t':''}" aria-pressed="${x.id===h.id}">${ci(x.cls,20)} ${esc(x.name)} · ${level(x)}</button>`).join('')+'<button class="b-gold" data-new="1">+ New character</button>';
   $('#hr-top').innerHTML=`<div style="display:flex;gap:14px;align-items:center">${ci(h.cls,64)}<div style="flex:1"><div class="disp" style="font-size:34px;line-height:1.05">${esc(h.name)}</div>
     <div class="cond" style="color:${C.c};font-size:15px">${C.n} · Level ${L}${h.spec?' · '+c[h.spec].n:''} <span class="sub" style="text-transform:none;letter-spacing:0">· class locked</span></div></div></div>
     <div><div style="display:flex;justify-content:space-between;font-size:14px"><span class="cond">XP</span><span>${nx?`${h.xp} / ${nx} to level ${L+1}`:`${h.xp} · max level`}</span></div><div class="hp" style="height:8px"><i style="width:${nx?Math.min(100,100*(h.xp-pv)/(nx-pv)):100}%;background:linear-gradient(90deg,#71617c,#c6a15b)"></i></div></div>
-    <div class="g3">${[['HP',s.hp],['Move',s.mv],['Neural Load',s.nl],['Aim rerolls',s.aim],['Dodge rerolls',s.reflex],['Pack slots',s.pack]].map(([a,b])=>`<div class="stat"><b>${b}</b><span class="sub" style="font-size:13px">${a}</span></div>`).join('')}</div>
+    <div class="g3">${[['HP',s.hp],['Move',s.mv],['Dodge',s.dodge],['Neural Load',s.nlUsed+' / '+s.nl],['Aim rerolls',s.aim],['Dodge rerolls',s.reflex]].map(([a,b])=>`<div class="stat"><b>${b}</b><span class="sub" style="font-size:13px">${a}</span></div>`).join('')}</div>
     <div class="g2"><button class="b-out" id="hr-play">Play a match (demo)</button><button id="hr-respec">Respec · 20 cr</button></div>
     ${H.list.length>1?'<button class="b-out" id="hr-del" style="min-height:38px">Retire this character</button>':''}`;
+  const g=h.gear||GN.gear.HG(),W=s.weapon,B=GN.gear.byId;
+  $('#hr-equip').innerHTML=`<div class="vh" style="margin:0"><h2>Equipped</h2><a class="cond" href="#gear" style="font-size:14px">Change gear ›</a></div>
+    ${W?`<div><div class="cond" style="font-size:13px;color:var(--mute)">${esc(W.wt)} weapon</div><b style="font-size:18px">${esc(W.n)}</b><table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:4px">${W.st.map(([a,b])=>`<tr><td class="sub" style="padding:2px 0;width:38%">${a}</td><td style="padding:2px 0;font-weight:600">${esc(b)}</td></tr>`).join('')}</table><p class="sub" style="margin:4px 0 0;font-size:13px">${esc(W.fx)}</p></div>`:'<p class="sub" style="margin:0">No weapon equipped.</p>'}
+    <div class="mrule"><b>Implants</b><span>${g.cyber.length?g.cyber.map(id=>`${esc(B(id).n)} (load ${B(id).load})`).join(' · '):'None'} · Neural Load ${s.nlUsed}/${s.nl}</span></div>
+    <div class="mrule"><b>Mission pack</b><span>${g.pack.length?g.pack.map(id=>esc(B(id).n)).join(', '):'Empty'} · ${g.pack.length}/${s.pack}</span></div>
+    <div class="mrule"><b>Reactions</b><span>${s.reacts.map(esc).join(' · ')} · one per round</span></div>`;
   $('#hr-class').innerHTML=classCard(h.cls,true);
   const ap=attrPts(h);
   $('#hr-attr').innerHTML=`<div class="vh" style="margin:0"><h2>Attributes</h2><span class="cond" style="color:${ap?'var(--gold)':'var(--mute)'}">${ap} point${ap===1?'':'s'} to spend</span></div>
@@ -85,6 +98,7 @@ function render(){
     <div class="tree">${['A','B'].map(b=>`<div class="br ${h.spec===b?'sp':''}"><div class="cond" style="color:${C.c}">${c[b].n}${h.spec===b?' · your specialization':''}</div><div class="sub" style="font-size:13px;margin-bottom:6px">${c[b].d}</div>${T.filter(t=>t[0]===b).map(node).join('<div class="link"></div>')}</div>`).join('')}</div>
     ${node(T.find(t=>t[0]==='L'))}`;
   syncAll();
+  if(shown&&GN.loSync)GN.loSync(h);
 }
 function classCard(k,full){const c=CB[k],C=GN.CLASSES[k];
   return `<div style="display:flex;gap:12px;align-items:center">${ci(k,44)}<div><div class="cond" style="font-size:13px;color:var(--mute)">Class</div><div class="disp" style="font-size:28px;line-height:1.05;color:${C.c}">${C.n}</div><div class="sub">${c.role}</div></div></div>
@@ -94,6 +108,7 @@ function classCard(k,full){const c=CB[k],C=GN.CLASSES[k];
   <div class="mrule"><b>Strengths</b><span>${c.plus.map(esc).join(' · ')}</span></div><div class="mrule"><b>Weaknesses</b><span>${c.minus.map(esc).join(' · ')}</span></div>
   <div class="mrule"><b>Starts with</b><span>${esc(c.gear)}</span></div>${full?`<div class="mrule"><b>Paths</b><span>${c.A.n}: ${c.A.d} ${c.B.n}: ${c.B.d}</span></div>`:''}`;}
 function syncAll(){
+  if(!active().gear&&GN.gear&&GN.gear.HG)try{GN.gear.HG();}catch(e){}
   const h=active(),C=GN.CLASSES[h.cls],L=level(h),s=stats(h);
   const n=$('#me-name');if(n)n.textContent=h.name;const sb=$('#me-sub');if(sb)sb.textContent=`${C.n} · Lvl ${L} · Outlaws · League #38`;const hp=$('#me-hp');if(hp)hp.textContent=`HP ${s.hp}/${s.hp}`;
   if(store.get('char','outlaw')!==h.model&&GN.chars&&GN.chars.get(h.model)){store.set('char',h.model);if(GN.loChar)GN.loChar(h.model);}
@@ -145,7 +160,7 @@ function wizard(){
       else if(e.target.closest('#wz-next')){if(step===3)return;if(step===2&&!st.name)st.name='';step++;draw();}
       else if(e.target.closest('#wz-back')){step--;draw();}
       else if(e.target.closest('#wz-ok')){const nm=(c.querySelector('#wz-name').value||'').trim();if(!nm){toast('Give your character a name.');return;}
-        const h={id:'h'+Date.now().toString(36),name:nm,model:st.model,cls:st.cls,xp:0,attrs:{grit:0,aim:0,reflex:0,tech:0},talents:[],spec:null,created:Date.now()};
+        const h={id:'h'+Date.now().toString(36),name:nm,model:st.model,cls:st.cls,xp:0,attrs:{grit:0,aim:0,reflex:0,tech:0},talents:[],spec:null,created:Date.now()};h.gear=GN.gear.startGear(st.cls);
         H.list.push(h);H.active=h.id;saveH();close();render();toast(`${nm} the ${GN.CLASSES[st.cls].n} is ready. Class locked.`);}
     });
     c.addEventListener('input',e=>{if(e.target.id==='wz-name')st.name=e.target.value;});
@@ -154,7 +169,7 @@ function wizard(){
     draw();
   });
 }
-GN.hero={active,level,stats,on(f){subs.push(f);},list:()=>H.list,setActive(id){H.active=id;saveH();render();},CB};
-GN.register('hero',{show:render});
+GN.hero={active,level,stats,on(f){subs.push(f);},list:()=>H.list,setActive(id){H.active=id;saveH();render();},CB,save:saveH,refresh(){if(shown)render();else syncAll();}};
+GN.register('hero',{show(){shown=true;render();if(GN.loShow)GN.loShow();if(GN.loSync)GN.loSync(active());},hide(){shown=false;if(GN.loHide)GN.loHide();}});
 syncAll();
 })();

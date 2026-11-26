@@ -13,11 +13,11 @@ $('#modal').addEventListener('click',e=>{if(e.target.id==='modal'){$('#modal').h
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#modal').hidden=true;});
 function setCr(n){st.cr=n;save();$('#cr').textContent=n+' cr';$('#me-cr').textContent=n+' cr';}
 function route(){
-  const v=(location.hash||'#home').slice(1);const name=views[v]?v:'home';
+  let v=(location.hash||'#home').slice(1);if(v==='loadout')v='hero';const name=views[v]?v:'home';
   if(current===name)return;
   if(current&&views[current].hide)views[current].hide();
   $$('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+name));
-  $$('.nav a').forEach(a=>a.classList.toggle('cur',a.dataset.v===name||(name==='loadout'&&a.dataset.v==='gear')));
+  $$('.nav a').forEach(a=>a.classList.toggle('cur',a.dataset.v===name||false));
   current=name;window.scrollTo(0,0);if(views[name].show)views[name].show();
 }
 function register(name,v){views[name]=v||{};}
