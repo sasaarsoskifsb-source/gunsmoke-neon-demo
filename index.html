@@ -148,6 +148,19 @@ select{font:inherit;min-height:42px;border-radius:8px;background:var(--panel2);c
 .thumb img{width:100%;aspect-ratio:1;object-fit:contain}
 .mrule{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.mrule:last-child{border:0}
 .mrule b{flex:none;width:7.5em;font:700 14px "Barlow Condensed",sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--gold)}
+.attr{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}
+.pips{display:flex;gap:4px}.pips i{width:12px;height:12px;border-radius:3px;border:1px solid var(--gold)}.pips i.on{background:var(--gold)}
+.tree{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.br{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column}
+.br.sp{border-color:var(--gold);box-shadow:0 0 12px #c6a15b33}
+.tal{flex-direction:column;align-items:flex-start;text-align:left;text-transform:none;letter-spacing:0;gap:2px;width:100%;min-height:0;padding:8px 10px}
+.tal b{font:700 16px "Barlow Condensed",sans-serif;letter-spacing:.03em}
+.tal small{font:500 13px/1.3 Barlow,sans-serif;color:#e3d8cc}
+.tal .tg{font:600 12px "Barlow Condensed",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.tal.own{border-color:var(--teal);background:#173a3d}
+.tal[aria-disabled=true]{opacity:.6}
+.link{width:2px;height:10px;background:var(--line);margin:0 auto}
+@media(max-width:520px){.tree{grid-template-columns:minmax(0,1fr)}}
 /* trophies */
 .tro{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
 .tro>div{border-radius:10px;background:var(--panel);border:1px solid var(--line);padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
@@ -229,7 +242,7 @@ window.GNSplash={hide:hide};})();
 <section class="view" id="v-home" aria-label="Home">
   <div class="grid2">
     <div class="col">
-      <a class="card me" href="#loadout"><img src="wanted.jpg" alt="Pistolwhisker portrait"><div style="flex:1"><div class="cond" style="font-size:21px">Pistolwhisker</div><div class="sub">Gunslinger · Lvl 7 · Outlaws · League #38</div></div><div style="text-align:right"><div class="cond" style="color:var(--gold)" id="me-cr">142 cr</div><div style="font-size:13px;color:var(--teal)">HP 7/7</div></div></a>
+      <a class="card me" href="#hero"><img src="wanted.jpg" alt="Character portrait"><div style="flex:1"><div class="cond" style="font-size:21px" id="me-name">Pistolwhisker</div><div class="sub" id="me-sub">Gunslinger · Lvl 7 · Outlaws · League #38</div></div><div style="text-align:right"><div class="cond" style="color:var(--gold)" id="me-cr">142 cr</div><div style="font-size:13px;color:var(--teal)" id="me-hp">HP 7/7</div></div></a>
       <div class="big2">
         <a class="cta ar" href="#ar"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#32d6d0" stroke-width="2" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg><div><b style="color:var(--teal)">AR Playground</b><div class="sub" style="color:#bde6e3">Put the board on your table</div></div></a>
         <a class="cta live" href="#live"><div class="cond" style="font-size:13px;color:var(--magl)"><span class="live-dot"></span>Live · <span id="h-viewers">12</span> watching</div><div><b style="color:var(--magl)">Watch Live Match</b><div class="sub" style="color:#f3c2bf">Zone War: Drone Hub</div></div></a>
@@ -360,9 +373,19 @@ window.GNSplash={hide:hide};})();
   </div>
 </section>
 
+<!-- HERO -->
+<section class="view" id="v-hero" aria-label="Character">
+  <div class="vh"><h1>Character</h1><a class="cond" href="#loadout">3D loadout ›</a></div>
+  <div class="row" id="hr-heroes" role="group" aria-label="Your characters" style="margin-bottom:12px"></div>
+  <div class="grid2">
+    <div class="col"><div class="card col" id="hr-top" style="gap:12px"></div><div class="card col" id="hr-attr" style="gap:10px"></div><div class="card col" id="hr-class" style="gap:10px"></div></div>
+    <div class="card col" id="hr-tree" style="gap:10px"></div>
+  </div>
+</section>
+
 <!-- LOADOUT -->
 <section class="view" id="v-loadout" aria-label="Loadout">
-  <div class="vh" style="flex-wrap:wrap"><h1>Loadout</h1><div class="row" id="lo-chars" role="group" aria-label="Character"></div><button id="lo-del" class="b-out" style="min-height:38px">Manage characters</button></div>
+  <div class="vh" style="flex-wrap:wrap"><h1>Loadout</h1><div class="row" id="lo-chars" role="group" aria-label="Character"></div><button id="lo-del" class="b-out" style="min-height:38px">Manage miniatures</button></div>
   <div class="grid2" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
     <div id="lo-view"><div id="lo-cam"><button id="lo-spin" class="on-t">Turntable</button><button data-cam="full">Full</button><button data-cam="head">Head</button><button data-cam="back">Back</button></div><div id="lo-load">Loading miniature…</div></div>
     <div class="col">
@@ -381,7 +404,7 @@ window.GNSplash={hide:hide};})();
   <a href="#maps" data-v="maps"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Maps</a>
   <a href="#live" data-v="live"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="13" rx="2"/><path d="M10 9l5 2.5-5 2.5z"/></svg>Live</a>
   <a href="#gear" data-v="gear"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Gear</a>
-  <a href="#trophies" data-v="trophies"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/></svg>Trophies</a>
+  <a href="#hero" data-v="hero"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg>Hero</a>
 </nav>
 <div id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="md-t"><div class="card" id="md-c"></div></div>
 <div id="toast" role="status"></div>
@@ -394,6 +417,7 @@ window.GNSplash={hide:hide};})();
 <script src="chars.js"></script>
 <script src="gear.js"></script>
 <script src="maps.js"></script>
+<script src="hero.js"></script>
 <script src="ar.js"></script>
 <script src="live.js"></script>
 <script src="loadout.js"></script>

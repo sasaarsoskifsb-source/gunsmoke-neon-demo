@@ -196,13 +196,10 @@ GN.loStart=()=>{t0=performance.now();requestAnimationFrame(loop);};GN.loStart();
 }
 
 const CLS={gunslinger:'Gunslinger',brawler:'Brawler',tech:'Tech-Slinger',ghost:'Ghost',sniper:'Sniper'};
-function renderChars(){const el=$('#lo-chars');if(!el)return;let sel=GN.store.get('char','outlaw');if(!GN.chars.get(sel)){sel=GN.chars.first();GN.store.set('char',sel);}
-  el.innerHTML=GN.chars.list().map(c=>`<button data-c="${GN.esc(c.id)}" class="${c.id===sel?'on-t':''}" aria-pressed="${c.id===sel}">${GN.esc(c.name)}${c.builtin?'':' ★'}</button>`).join('')+'<button class="b-gold" data-up="1">+ Upload</button>';
-}
-GN.chars.on(renderChars);renderChars();
-$('#lo-chars').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
-  if(b.dataset.up){uploadDialog();return;}
-  GN.store.set('char',b.dataset.c);renderChars();if(GN.loChar)GN.loChar(b.dataset.c);});
+function renderChars(){const el=$('#lo-chars');if(!el||!GN.hero)return;const a=GN.hero.active();
+  el.innerHTML=GN.hero.list().map(h=>`<button data-hid="${GN.esc(h.id)}" class="${h.id===a.id?'on-t':''}" aria-pressed="${h.id===a.id}">${GN.classIcon(h.cls,18)} ${GN.esc(h.name)}</button>`).join('')+'<a class="btn b-gold" href="#hero">+ New</a>';}
+GN.chars.on(renderChars);setTimeout(renderChars,0);if(GN.hero)GN.hero.on(renderChars);
+$('#lo-chars').addEventListener('click',e=>{const b=e.target.closest('[data-hid]');if(!b)return;GN.hero.setActive(b.dataset.hid);renderChars();});
 function uploadDialog(){
   GN.modal(`<h2 id="md-t" class="cond" style="color:var(--gold)">Upload your character</h2>
   <p class="sub" style="margin:0">A .glb file (binary glTF 2.0), standing upright and facing forward (+Z), up to ${GN.chars.MAXMB} MB. Best on phones: under 60k triangles and 2K textures. It stays on this device.</p>
@@ -239,5 +236,5 @@ function manage(){
 }
 $('#lo-del').addEventListener('click',manage);
 GN.loadoutSet=(slotId,id)=>{cur[slotId]=id;try{localStorage.setItem('gn-loadout',JSON.stringify(cur));}catch(e){}renderUI();apply();};
-GN.register('loadout',{show(){visible=true;if(!started)init3d();else if(GN.loStart)GN.loStart();},hide(){visible=false;}});
+GN.register('loadout',{show(){renderChars();visible=true;if(!started)init3d();else if(GN.loStart)GN.loStart();},hide(){visible=false;}});
 }

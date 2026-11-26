@@ -13,7 +13,7 @@ const CLASSES={
   svg:'<g class="ci-fade"><path d="M10 34V19a10 10 0 0 1 20 0v15l-3.5-3-3.3 3-3.2-3-3.3 3-3.2-3z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><circle cx="16.5" cy="20" r="1.8" fill="currentColor"/><circle cx="23.5" cy="20" r="1.8" fill="currentColor"/></g>'},
  sniper:{n:'Sniper',c:'#f1e9db',p:'Steady Hand: aim after moving 1 hex, sniper range 4–9.',
   svg:'<g class="ci-scope"><circle cx="20" cy="20" r="12" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M20 4v8M20 28v8M4 20h8M28 20h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></g><circle cx="20" cy="20" r="2.4" fill="#ff5d5b" class="ci-blink"/>'}};
-const icon=(k,size,anim)=>`<svg class="ci ${anim?'anim':''}" role="img" aria-label="${CLASSES[k].n}" width="${size}" height="${size}" viewBox="0 0 40 40" style="color:${CLASSES[k].c}">${CLASSES[k].svg}</svg>`;
+const icon=(k,size)=>`<svg class="ci" role="img" aria-label="${CLASSES[k].n}" width="${size}" height="${size}" viewBox="0 0 40 40" style="color:${CLASSES[k].c}">${CLASSES[k].svg}</svg>`;
 GN.classIcon=icon;GN.CLASSES=CLASSES;
 /* ---------- catalogue ---------- */
 // t: weapon|cyber|consumable|loot · wt: weapon type · fit: classes that use it best
@@ -67,10 +67,10 @@ const tIcon=i=>TI[i.wt]||TI[i.t];
 /* ---------- state ---------- */
 if(!st.g)st.g={own:{revolver:1,katana:1,smg:1,sniper:1,rocket:1,heavyrev:1,shotgun:1,ekatana:1,emp:1,cyberreflex:1,jetboost:1,cybereyes:1,neural:1,plasma:1,camo:1,subdermal:1,grapple:1,overclock:1,nanoheal:3,granate:2,smoke:2,stim:4,empnade:1,flash:2,spike:1,patch:2,knives:6,aicore:1,star:1,lucky:1,ghostcoat:1,compass:1,ledger:1,fang:1,keycard:1},weapon:'revolver',cyber:['cyberreflex','jetboost'],pack:['nanoheal','granate','stim']};
 const G=st.g;
-const myClass=()=>{const c=GN.chars&&GN.chars.get(GN.store.get('char','outlaw'));return c&&CLASSES[c.cls]?c.cls:'gunslinger';};
-const loadCap=()=>myClass()==='tech'?8:6;
+const myClass=()=>GN.hero?GN.hero.active().cls:'gunslinger';
+const loadCap=()=>GN.hero?GN.hero.stats(GN.hero.active()).nl:6;
 const loadUsed=()=>G.cyber.reduce((s,id)=>s+(byId(id).load||0),0);
-const PACK=4,SLOTS=3;
+const SLOTS=3;let PACK=4;
 let filter='all',sel='plasma',clsF=null;
 function rulesFor(i){
   if(i.t==='weapon')return `${i.wt} · one weapon equipped at a time`;
@@ -79,8 +79,9 @@ function rulesFor(i){
   return 'Loot · unlimited · always active · copies do not stack';
 }
 function render(){
+  PACK=GN.hero?GN.hero.stats(GN.hero.active()).pack:4;
   const mc=myClass();
-  $('#g-class').innerHTML=`<div style="display:flex;gap:12px;align-items:center">${icon(mc,56,true)}<div style="flex:1"><div class="cond" style="font-size:13px;color:var(--mute)">Your class</div><div class="disp" style="font-size:28px;line-height:1.05;color:${CLASSES[mc].c}">${CLASSES[mc].n}</div><div class="sub">${esc(CLASSES[mc].p)}</div></div></div>
+  $('#g-class').innerHTML=`<div style="display:flex;gap:12px;align-items:center">${icon(mc,56,true)}<div style="flex:1"><div class="cond" style="font-size:13px;color:var(--mute)">${GN.hero?esc(GN.hero.active().name)+' · ':''}class locked</div><div class="disp" style="font-size:28px;line-height:1.05;color:${CLASSES[mc].c}">${CLASSES[mc].n}</div><div class="sub">${esc(CLASSES[mc].p)}</div></div></div>
    <div class="cls-row" role="group" aria-label="Show gear that fits a class">${Object.keys(CLASSES).map(k=>`<button data-cls="${k}" class="${clsF===k?'on-t':''}" aria-pressed="${clsF===k}" title="Gear for ${CLASSES[k].n}">${icon(k,30,true)}<span>${CLASSES[k].n}</span></button>`).join('')}</div>`;
   const lu=loadUsed(),lc=loadCap();
   $('#g-slots').innerHTML=`<div style="border-color:${RC[byId(G.weapon).r]}"><div class="sub" style="font-size:12px">Weapon</div><b style="font-size:14px">${esc(byId(G.weapon).n)}</b></div>`+
