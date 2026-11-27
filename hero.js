@@ -77,7 +77,7 @@ function render(){
     <div><div style="display:flex;justify-content:space-between;font-size:14px"><span class="cond">XP</span><span>${nx?`${h.xp} / ${nx} to level ${L+1}`:`${h.xp} · max level`}</span></div><div class="hp" style="height:8px"><i style="width:${nx?Math.min(100,100*(h.xp-pv)/(nx-pv)):100}%;background:linear-gradient(90deg,#71617c,#c6a15b)"></i></div></div>
     <div class="g3">${[['HP',s.hp],['Move',s.mv],['Dodge',s.dodge],['Neural Load',s.nlUsed+' / '+s.nl],['Aim rerolls',s.aim],['Dodge rerolls',s.reflex]].map(([a,b])=>`<div class="stat"><b>${b}</b><span class="sub" style="font-size:13px">${a}</span></div>`).join('')}</div>
     <div class="g2"><button class="b-out" id="hr-play">Play a match (demo)</button><button id="hr-respec">Respec · 20 cr</button></div>
-    ${H.list.length>1?'<button class="b-out" id="hr-del" style="min-height:38px">Retire this character</button>':''}`;
+    <button class="b-out" id="hr-del" style="min-height:38px">Delete this character</button>`;
   const g=h.gear||GN.gear.HG(),W=s.weapon,B=GN.gear.byId;
   $('#hr-equip').innerHTML=`<div class="vh" style="margin:0"><h2>Equipped</h2><a class="cond" href="#gear" style="font-size:14px">Change gear ›</a></div>
     ${W?`<div><div class="cond" style="font-size:13px;color:var(--mute)">${esc(W.wt)} weapon</div><b style="font-size:18px">${esc(W.n)}</b><table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:4px">${W.st.map(([a,b])=>`<tr><td class="sub" style="padding:2px 0;width:38%">${a}</td><td style="padding:2px 0;font-weight:600">${esc(b)}</td></tr>`).join('')}</table><p class="sub" style="margin:4px 0 0;font-size:13px">${esc(W.fx)}</p></div>`:'<p class="sub" style="margin:0">No weapon equipped.</p>'}
@@ -124,7 +124,20 @@ $('#v-hero').addEventListener('click',e=>{const h=active();let b;
   if(e.target.closest('#hr-play')){playMatch(h);return;}
   if(e.target.closest('#hr-respec')){if(!h.talents.length&&!Object.values(h.attrs).some(v=>v)){toast('Nothing to reset.');return;}
     modal(`<h2 id="md-t" class="cond" style="color:var(--gold)">Respec ${esc(h.name)}?</h2><p style="margin:0">All attribute and talent points and the specialization come back for 20 cr. Level, XP and class stay: the class is locked.</p><div class="g2"><button data-close>Cancel</button><button class="b-gold" id="rs-ok">Respec · 20 cr</button></div>`,(c,close)=>c.querySelector('#rs-ok').addEventListener('click',()=>{if(GN.st.cr<20){toast('Not enough credits.');return;}GN.addCr(-20);h.attrs={grit:0,aim:0,reflex:0,tech:0};h.talents=[];h.spec=null;saveH();close();render();toast('Points refunded. Build again.');}));return;}
-  if(e.target.closest('#hr-del')){modal(`<h2 id="md-t" class="cond" style="color:var(--gold)">Retire ${esc(h.name)}?</h2><p style="margin:0">The character, its level and build are removed for good. The miniature stays.</p><div class="g2"><button data-close>Keep</button><button class="b-gold" id="dl-ok">Retire</button></div>`,(c,close)=>c.querySelector('#dl-ok').addEventListener('click',()=>{H.list=H.list.filter(x=>x.id!==h.id);H.active=H.list[0].id;saveH();close();render();toast(`${h.name} retired.`);}));}
+  if(e.target.closest('#hr-del')){const last=H.list.length===1,others=H.list.filter(x=>x.id!==h.id&&x.model===h.model).length,M=GN.chars.get(h.model),canMini=M&&!others&&GN.chars.list().length>1;
+    modal(`<h2 id="md-t" class="cond" style="color:var(--gold)">Delete ${esc(h.name)}?</h2>
+      <p style="margin:0">The character is deleted for good: level ${level(h)}, ${h.xp} XP, attributes, talents, specialization and the gear it carries. This cannot be undone.</p>
+      ${canMini?`<label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer"><input type="checkbox" id="dl-mini" style="width:22px;height:22px;margin-top:2px;accent-color:#ff5d5b"><span>Also delete its 3D miniature <b>${esc(M.name)}</b>${M.builtin?' (built-in, can be restored from Manage miniatures)':' (your uploaded .glb file)'}</span></label>`:M?`<p class="sub" style="margin:0">The miniature ${esc(M.name)} stays: ${others?'another character uses it':'it is your only miniature'}.</p>`:''}
+      ${last?'<p style="margin:0;color:var(--magl)">This is your only character. You will create a new one first; then this one is deleted.</p>':''}
+      <label class="r" style="margin:0">Type the name to confirm<input id="dl-name" autocomplete="off" placeholder="${esc(h.name)}" style="flex:1;min-height:44px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--bone);padding:0 10px;font:inherit"></label>
+      <div class="g2"><button data-close>Keep</button><button class="b-gold" id="dl-ok" disabled>Delete for good</button></div>`,(c,close)=>{
+      const ok=c.querySelector('#dl-ok');c.querySelector('#dl-name').addEventListener('input',e=>{ok.disabled=e.target.value.trim()!==h.name;});
+      ok.addEventListener('click',()=>{let mini=!!(c.querySelector('#dl-mini')&&c.querySelector('#dl-mini').checked);close();
+        const finish=async()=>{H.list=H.list.filter(x=>x.id!==h.id);if(H.active===h.id||!H.list.some(x=>x.id===H.active))H.active=H.list[0].id;saveH();
+          if(mini&&H.list.some(x=>x.model===h.model)){mini=false;toast('Miniature kept: the new character uses it.');}
+          if(mini){try{await GN.chars.remove(h.model);}catch(err){mini=false;toast(err.message);}}
+          render();toast(`${h.name} deleted${mini?' with its miniature':''}.`);};
+        if(last){toast('Create your new character first.');wizard(finish);}else finish();});});}
 });
 function playMatch(h){
   const before=level(h),win=Math.random()<.55,obj=Math.random()<.5,downs=Math.floor(Math.random()*3);
@@ -136,7 +149,7 @@ function playMatch(h){
   render();
 }
 /* ---------- creation wizard: miniature → class (locked) → name ---------- */
-function wizard(){
+function wizard(onDone){
   const st={model:null,cls:null,name:''};let step=1;
   modal('<div id="wz"></div>',(c,close)=>{
     const draw=()=>{const w=c.querySelector('#wz');
@@ -154,17 +167,18 @@ function wizard(){
         <p style="margin:0;color:var(--magl)">Once created, the class cannot be changed. You can still respec attributes and talents.</p>
         <div class="g2"><button id="wz-back">Back</button><button class="b-gold" id="wz-ok">Create and lock class</button></div>`;
     };
-    c.addEventListener('click',e=>{let b;
+    c.querySelector('#wz').addEventListener('click',e=>{let b;
+      if(e.target.closest('[data-close]')){close();return;}
       if((b=e.target.closest('[data-m]'))){st.model=b.dataset.m;draw();}
       else if((b=e.target.closest('[data-c]'))){st.cls=b.dataset.c;draw();}
       else if(e.target.closest('#wz-next')){if(step===3)return;if(step===2&&!st.name)st.name='';step++;draw();}
       else if(e.target.closest('#wz-back')){step--;draw();}
       else if(e.target.closest('#wz-ok')){const nm=(c.querySelector('#wz-name').value||'').trim();if(!nm){toast('Give your character a name.');return;}
         const h={id:'h'+Date.now().toString(36),name:nm,model:st.model,cls:st.cls,xp:0,attrs:{grit:0,aim:0,reflex:0,tech:0},talents:[],spec:null,created:Date.now()};h.gear=GN.gear.startGear(st.cls);
-        H.list.push(h);H.active=h.id;saveH();close();render();toast(`${nm} the ${GN.CLASSES[st.cls].n} is ready. Class locked.`);}
+        H.list.push(h);H.active=h.id;saveH();close();render();toast(`${nm} the ${GN.CLASSES[st.cls].n} is ready. Class locked.`);if(onDone)onDone();}
     });
-    c.addEventListener('input',e=>{if(e.target.id==='wz-name')st.name=e.target.value;});
-    c.addEventListener('change',async e=>{if(e.target.id!=='wz-up')return;const f=e.target.files[0];if(!f)return;
+    c.querySelector('#wz').addEventListener('input',e=>{if(e.target.id==='wz-name')st.name=e.target.value;});
+    c.querySelector('#wz').addEventListener('change',async e=>{if(e.target.id!=='wz-up')return;const f=e.target.files[0];if(!f)return;
       try{const r=await GN.chars.add(f,f.name.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').slice(0,32),'gunslinger');st.model=r.id;draw();toast('Miniature uploaded.');}catch(err){c.querySelector('#wz-err').textContent=err.message;}});
     draw();
   });
