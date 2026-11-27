@@ -26,7 +26,7 @@ function syncHome(){const m=get(sel);const i=$('#h-mapimg');if(i){i.src=m.img;i.
   const r=$('#lv-round');if(r&&!r.dataset.fixed){}}
 function render(){
   const m=get(view);
-  $('#mp-img').src=m.img;$('#mp-img').alt=`${m.n} board`;$('#mp-sel').hidden=view!==sel;
+  $('#mp-img').src=m.img;const gv=$('#mp-grid');if(gv&&GN.grid){gv.innerHTML='';GN.grid.forImage(m.img).then(G=>{if($('#mp-img').getAttribute('src')===m.img)gv.innerHTML=GN.grid.svg(G);});}$('#mp-img').alt=`${m.n} board`;$('#mp-sel').hidden=view!==sel;
   $('#mp-thumbs').innerHTML=MAPS.map(x=>`<button class="thumb ${x.id===view?'on-t':''}" data-m="${x.id}" aria-pressed="${x.id===view}"><img src="${x.img}" alt=""><span>${esc(x.n)}${x.id===sel?' ✓':''}</span></button>`).join('');
   $('#mp-info').innerHTML=`<span class="rt rare">${esc(m.zone)} · ${m.players} players</span>
    <h2 class="disp" style="font-size:36px;line-height:1.05;text-transform:none;letter-spacing:.01em">${esc(m.n)}</h2>
@@ -45,3 +45,5 @@ GN.maps={list:MAPS,get,selected:()=>sel,select,on(f){subs.push(f);}};
 syncHome();
 GN.register('maps',{show(){view=sel;render();}});
 })();
+
+{const b=document.getElementById('mp-hex');if(b)b.addEventListener('click',()=>{const g=document.getElementById('mp-grid'),on=g.hidden;g.hidden=!on;b.classList.toggle('on-t',on);b.setAttribute('aria-pressed',on);});}

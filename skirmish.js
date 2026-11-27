@@ -30,10 +30,9 @@ function prof(u,d){
 }
 /* ---------- board ---------- */
 let G3=null; // three groups
-function buildBoard(){
-  const B=GN.ar.board(),cols=11,R=Math.min(B.w*.86/(cols*SQ),B.h*.86/(9*1.5+.5));
-  const H=new Map();
-  for(let r=-4;r<=4;r++)for(let q=-8;q<=8;q++){const x=R*SQ*(q+r/2),y=R*1.5*r;if(Math.abs(x)>B.w*.43||Math.abs(y)>B.h*.43)continue;H.set(K(q,r),{q,r,k:K(q,r),x,y});}
+function buildBoard(g){ // g = the AR movement grid in mm
+  const R=g.R,H=new Map();
+  for(const c of g.cells)H.set(K(c.q,c.r),{q:c.q,r:c.r,k:K(c.q,c.r),x:c.x,y:c.y});
   const pick=(q,r)=>{let best=null,bd=1e9;for(const h of H.values()){const d=Math.hypot(h.q-q,h.r-r);if(d<bd){bd=d;best=h;}}return best;};
   const cps=[pick(0,0),pick(-4,-2),pick(4,2),pick(3,-3),pick(-3,3)].filter((h,i,a)=>h&&a.indexOf(h)===i);
   cps.forEach(h=>h.cp=true);
@@ -54,8 +53,7 @@ function hexShape(R){const s=new THREE.Shape();for(let i=0;i<6;i++){const a=Math
 function build3D(){
   const paper=GN.ar.paper();if(G3)paper.remove(G3.root);
   const root=new THREE.Group();paper.add(root);const R=M.R;
-  const pts=[];for(const h of M.H.values())for(let i=0;i<6;i++){const a=Math.PI/180*(60*i-30),b=Math.PI/180*(60*i+30);pts.push(new THREE.Vector3(h.x+R*Math.cos(a),h.y+R*Math.sin(a),.6),new THREE.Vector3(h.x+R*Math.cos(b),h.y+R*Math.sin(b),.6));}
-  root.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0x32d6d0,transparent:true,opacity:.35})));
+  GN.ar.hex().visible=true;
   const hexG=new THREE.ShapeGeometry(hexShape(R*.9));
   const mk=(c,o)=>new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false});
   const deco=new THREE.Group();root.add(deco);
@@ -274,12 +272,13 @@ function makeHero(){const h=GN.hero.active(),S=GN.hero.stats(h),g=h.gear||GN.gea
     react:true,aimR:S.aim,dodgeR:S.reflex,reflexDie:has('cyberreflex'),sub:has('subdermal'),decoy:has('holodecoy'),plasma:has('plasma'),camo:has('camo'),eyes:has('cybereyes'),titan:has('titanium'),lastStand:h.talents.includes('stand'),
     pack:g.pack.slice(),st:'ok',dealt:0,downs:0};}
 function makeBot(b,i,ffa){const C=GN.hero.CB[b.cls];return{id:'b'+i,name:b.name,cls:b.cls,team:ffa?i+1:1,hp:C.hp,max:C.hp,mv:C.mv,w:b.w,wn:GN.gear.byId(b.w).n,tal:[],react:true,aimR:0,dodgeR:0,reflexDie:b.cls==='gunslinger',sub:false,decoy:false,plasma:false,camo:false,pack:['nanoheal'],st:'ok',dealt:0,downs:0};}
-function startMatch(){
+async function startMatch(){
   if(!GN.ar.ensure()){toast('3D is not available here.');return;}
   if(!GN.ar.hasPose())GN.ar.preview();
   const n=+$('#sk-n').value,ffa=$('#sk-mode').value==='ffa',dice=$('#sk-dice').value;
   const B=BOTS.slice().sort(()=>Math.random()-.5).slice(0,n);
-  const bd=buildBoard();M={...bd,U:[makeHero(),...B.map((b,i)=>makeBot(b,i,ffa))],round:0,score:{},flagOwner:{},used:new Set(),smoke:new Set(),dice,over:false,cur:null,sel:null,mode:null,rd:{}};
+  const g=await GN.ar.grid();if(!g||g.cells.length<20){toast('The board grid is not ready. Try again.');return;}
+  const bd=buildBoard(g);M={...bd,U:[makeHero(),...B.map((b,i)=>makeBot(b,i,ffa))],round:0,score:{},flagOwner:{},used:new Set(),smoke:new Set(),dice,over:false,cur:null,sel:null,mode:null,rd:{}};
   M.U.forEach(u=>M.score[u.id]=0);M.cps.forEach(k=>M.flagOwner[k]=null);
   const edge=[...M.H.values()].sort((a,b)=>a.x-b.x),left=edge.filter(h=>!h.crate&&!h.cp).slice(0,6),right=edge.filter(h=>!h.crate&&!h.cp).slice(-12);
   M.U[0].k=left[Math.floor(left.length/2)].k;M.U.slice(1).forEach((u,i)=>{u.k=right[(i*4+1)%right.length].k;});

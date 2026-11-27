@@ -348,9 +348,10 @@ window.GNSplash={hide:hide};})();
   <div class="grid2" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
     <div class="col">
       <div class="card" style="position:relative;padding:10px;background:radial-gradient(circle at 50% 45%,#3a2a3e,#1b1119)">
-        <img id="mp-img" src="map-dryridge.webp" alt="" style="display:block;width:100%;max-height:62vh;object-fit:contain">
+        <div id="mp-frame" style="position:relative;width:fit-content;max-width:100%;margin:0 auto"><img id="mp-img" src="map-dryridge.webp" alt="" style="display:block;max-width:100%;max-height:62vh;width:auto;height:auto"><div id="mp-grid"></div></div>
         <button id="mp-prev" aria-label="Previous map" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);min-width:44px;padding:0">‹</button>
         <button id="mp-next" aria-label="Next map" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);min-width:44px;padding:0">›</button>
+        <button id="mp-hex" class="on-t" aria-pressed="true" style="position:absolute;right:10px;top:10px;min-height:34px;padding:4px 12px;font-size:14px;z-index:2">Hex grid</button>
         <span class="tag" id="mp-sel" style="background:#241923e6;border-color:var(--teal);color:var(--teal)" hidden>Selected for skirmish</span>
       </div>
       <div class="g4" id="mp-thumbs" role="group" aria-label="All maps"></div>
@@ -436,6 +437,7 @@ window.GNSplash={hide:hide};})();
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="detect.js"></script>
 <script src="app.js"></script>
+<script src="grid.js"></script>
 <script src="chars.js"></script>
 <script src="gear.js"></script>
 <script src="maps.js"></script>
