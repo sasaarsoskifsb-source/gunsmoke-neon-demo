@@ -71,6 +71,49 @@ const RC={common:'#b5a7b4',rare:'#32d6d0',epic:'#ff8f8d',legendary:'#c6a15b'};
 const TYPE={weapon:'Weapon',cyber:'Cyberware',consumable:'Consumable',loot:'Loot'};
 const TI={weapon:'<path d="M3 9h14l2-2h2v4h-4l-1 2h-3l-1 4H8l1-4H3z"/>',Melee:'<path d="M5 19L18 6l1-3 2 2-3 1L5 19l-1 2-2-2z"/>',Rocket:'<path d="M3 14l11-11h4v4L7 18zM6 14l4 4M3 21l3-3"/>',cyber:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>',consumable:'<path d="M9 2h6M10 2v5l-5 9a3 3 0 0 0 3 4h8a3 3 0 0 0 3-4l-5-9V2"/>',loot:'<path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/>'};
 const tIcon=i=>TI[i.wt]||TI[i.t];
+/* item symbols for the hero overlay (24x24, stroked) */
+const SYM={
+ revolver:'<path d="M2 8h13l1-2h3v4h-3l-1 2h-3l-1.5 6H6.5L8 12H2z"/><circle cx="12" cy="10" r="1.2"/>',
+ heavyrev:'<path d="M2 7h14l1-2h3v5h-3l-1 2h-3l-1.5 7H6l1.5-7H2z"/><path d="M2 9h8"/>',
+ shotgun:'<path d="M1 9h15l3 2h4v3h-6l-2 4h-3l1-4H1z"/><path d="M1 11.5h12"/>',
+ smg:'<path d="M2 8h15v4h-4l-1 2h-2v5H7v-5H5l-1-2H2z"/><path d="M17 9h4"/><path d="M10 14h2"/>',
+ sniper:'<path d="M1 12h17l3 2v3h-5l-2-3H8l-2 4H3l1-4H1z"/><rect x="8" y="7" width="7" height="3" rx="1"/><path d="M11.5 10v2"/>',
+ emp:'<path d="M1 12h15l3 2v3h-5l-2-3H8l-2 4H3l1-4H1z"/><path d="M12 3l-3 5h3l-2 3"/>',
+ katana:'<path d="M4 20L18 6l1.5-3.5L21 4l-3.5 1.5L4 20"/><path d="M6 15l3 3M3 21l2-2"/>',
+ ekatana:'<path d="M4 20L18 6l1.5-3.5L21 4l-3.5 1.5L4 20"/><path d="M6 15l3 3M3 21l2-2"/><path d="M14 3v3M20 9h-3"/>',
+ rocket:'<path d="M2 10h15l4 2-4 2H2z"/><path d="M5 14v4M9 14v3M2 10V8M2 14v2"/>',
+ cyberreflex:'<path d="M13 2L5 13h6l-2 9 9-12h-6z"/>',
+ jetboost:'<rect x="7" y="3" width="10" height="11" rx="2"/><path d="M9 14l-1 4 2-1 1 4 1-4 2 1-1-4"/>',
+ cybereyes:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M12 9v6"/>',
+ neural:'<circle cx="12" cy="5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><circle cx="12" cy="13" r="2"/><path d="M12 7v4M10.5 14.5l-4 2.3M13.5 14.5l4 2.3"/>',
+ plasma:'<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M8 12h8M12 8v8"/>',
+ camo:'<circle cx="12" cy="6" r="3" stroke-dasharray="2 2"/><path d="M6 21v-5a6 6 0 0 1 12 0v5" stroke-dasharray="2 2"/>',
+ subdermal:'<path d="M12 2l8 4.5v9L12 20l-8-4.5v-9z"/><path d="M12 2v18M4 6.5l16 9M20 6.5l-16 9"/>',
+ titanium:'<path d="M6 11V7a1.5 1.5 0 0 1 3 0v3-4a1.5 1.5 0 0 1 3 0v4-3a1.5 1.5 0 0 1 3 0v3-2a1.5 1.5 0 0 1 3 0v6a7 7 0 0 1-7 7h-1a5 5 0 0 1-5-5z"/>',
+ berserker:'<path d="M12 22c-5 0-7-4-6-8 1 2 2.5 3 3 3-1-4 1-8 5-12 0 4 4 6 4 11 0 3.5-2.5 6-6 6z"/>',
+ grapple:'<path d="M12 2v12"/><path d="M6 10c0 5 3 7 6 7s6-2 6-7"/><path d="M6 10l-2 2M18 10l2 2"/><circle cx="12" cy="20" r="2"/>',
+ overclock:'<path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l5-6"/><path d="M4 21h16"/>',
+ holodecoy:'<circle cx="8" cy="6" r="2.5"/><path d="M4 20v-5a4 4 0 0 1 8 0v5"/><circle cx="16" cy="6" r="2.5" stroke-dasharray="1.5 1.5"/><path d="M12.5 12.5A4 4 0 0 1 20 15v5" stroke-dasharray="1.5 1.5"/>',
+ feign:'<path d="M2 13h5l2-5 3 10 2-5h8"/>',
+ nanoheal:'<path d="M18 2l4 4M20 4l-9 9-4 1 1-4 9-9"/><path d="M7 14l-5 5 3 3 5-5"/><path d="M13 7l4 4"/>',
+ granate:'<circle cx="11" cy="14" r="7"/><path d="M9 7V4h4v3M13 5h4l2 2"/>',
+ smoke:'<path d="M6 18a4 4 0 0 1 0-8 5 5 0 0 1 9.5-1.5A4 4 0 0 1 18 18z"/><path d="M8 22h10M5 21h2"/>',
+ stim:'<rect x="8" y="2" width="8" height="20" rx="4"/><path d="M8 12h8"/><path d="M12 6v3M12 15v3"/>',
+ empnade:'<circle cx="11" cy="14" r="7"/><path d="M9 7V4h4v3"/><path d="M12 10l-2.5 4h3L10 18"/>',
+ flash:'<circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/>',
+ spike:'<path d="M3 21l7-7"/><path d="M10 14l-2-2 8-8 4 4-8 8z"/><path d="M14 6l4 4"/>',
+ patch:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/>',
+ knives:'<path d="M20 3L8 15l-2 1 1-2L19 2z"/><path d="M8 15l-3 3M3 21l2-2"/>',
+ aicore:'<path d="M12 2l7 8-7 12-7-12z"/><path d="M5 10h14M12 2v20"/>',
+ star:'<path d="M12 3l2.4 5 5.6.8-4 3.9 1 5.5L12 15.6 7 18.2l1-5.5-4-3.9 5.6-.8z"/><circle cx="12" cy="11" r="1.5"/>',
+ lucky:'<path d="M9 21V9a3 3 0 0 1 6 0v12z"/><path d="M9 14h6M9 17h6"/>',
+ ghostcoat:'<path d="M7 3l5 3 5-3 3 4-2 3v11H6V10L4 7z"/><path d="M12 6v15"/>',
+ compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+ ledger:'<path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 19a2 2 0 0 1 2-2h12M9 7h6M9 10h6"/>',
+ fang:'<path d="M6 3h12c0 7-3 13-6 18C9 16 6 10 6 3z"/><path d="M9 6h6"/>',
+ keycard:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h5M7 13h3"/><circle cx="16.5" cy="12" r="2"/>'};
+const sym=(id,size)=>{const i=byId(id),c=i?RC[i.r]:'#b5a7b4';return `<svg width="${size||24}" height="${size||24}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SYM[id]||(i&&(TI[i.wt]||TI[i.t]))||''}</svg>`;};
+
 /* ---------- state ---------- */
 if(!st.g)st.g={own:{revolver:1,katana:1,smg:1,sniper:1,rocket:1,heavyrev:1,shotgun:1,ekatana:1,emp:1,cyberreflex:1,jetboost:1,cybereyes:1,neural:1,plasma:1,camo:1,subdermal:1,grapple:1,overclock:1,nanoheal:3,granate:2,smoke:2,stim:4,empnade:1,flash:2,spike:1,patch:2,knives:6,aicore:1,star:1,lucky:1,ghostcoat:1,compass:1,ledger:1,fang:1,keycard:1},weapon:'revolver',cyber:['cyberreflex','jetboost'],pack:['nanoheal','granate','stim']};
 const G=st.g;
@@ -78,7 +121,7 @@ const G=st.g;
 function startGear(cls){const s=START[cls];[s.weapon,...s.cyber].forEach(id=>{if(!G.own[id])G.own[id]=1;});save();return{weapon:s.weapon,cyber:s.cyber.slice(),pack:['nanoheal','stim'].filter(id=>G.own[id])};}
 const HG=()=>{const h=GN.hero.active();if(!h.gear){h.gear=h.id==='h1'&&G.weapon?{weapon:G.weapon,cyber:G.cyber.slice(),pack:G.pack.slice()}:startGear(h.cls);GN.hero.save();}return h.gear;};
 const saveAll=()=>{save();GN.hero.save();GN.hero.refresh();};
-GN.gear={byId,allowed,allowedCls,startGear,HG:()=>HG(),WTYPES};
+GN.gear={byId,allowed,allowedCls,startGear,HG:()=>HG(),WTYPES,sym:(id,z)=>sym(id,z),RC,owned:id=>(G.own[id]||0)>0};
 const myClass=()=>GN.hero?GN.hero.active().cls:'gunslinger';
 const loadCap=()=>GN.hero?GN.hero.stats(GN.hero.active()).nl:6;
 const loadUsed=()=>HG().cyber.reduce((s,id)=>s+(byId(id).load||0),0);
