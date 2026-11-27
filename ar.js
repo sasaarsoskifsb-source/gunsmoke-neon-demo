@@ -52,7 +52,8 @@ function init(){
 function renderPick(){const el=$('#ar-pick');el.innerHTML=GN.chars.list().map(c=>`<button data-m="${GN.esc(c.id)}" class="${c.id===st.model?'on-t':''}" aria-pressed="${c.id===st.model}">${GN.esc(c.name)}</button>`).join('');}
 GN.chars.on(()=>{if(!GN.chars.get(st.model)){st.model=GN.chars.first();if(renderer)loadModel(st.model);}renderPick();});
 function loadModel(k){
-  if(!GN.chars.get(k))k=GN.chars.first();st.model=k;renderPick();
+  if(!GN.chars.exists(k)){GN.chars.ready.then(()=>{if(GN.chars.exists(k))loadModel(k);else if(st.model==null||st.model===k)loadModel(GN.chars.first());});if(GN.chars.list().length&&!GN.chars.exists(k))k=GN.chars.first();}
+  st.model=k;renderPick();
   if(!renderer)return;
   const use=g=>{if(st.model!==k)return;if(current)pivot.remove(current);current=g;pivot.add(g);fit();};
   if(cache[k]){use(cache[k]);return;}

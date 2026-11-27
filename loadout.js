@@ -45,9 +45,8 @@ const mesh=(g,m,p,r)=>{const o=new THREE.Mesh(g,m);if(p)o.position.set(...p);if(
 const CHARS={
  outlaw:{name:'Pistolwhisker',cls:'Gunslinger',head:[.05,1.74,0],hatY:1.8,face:[.1,1.75,.12],backC:[.0,1.22,-.2],hipL:[-.21,.97,.04],hipR:[.21,.97,.04],shL:[-.22,1.41,-.01],belt:[.02,1.0,.02,1.1,.95],halo:2.02,spine:[0,1.5,-.19]},
  vigilante:{name:'Vigilante',cls:'Gunslinger',head:[.07,1.69,-.03],hatY:1.8,face:[.11,1.72,.1],backC:[.06,1.28,-.3],hipL:[-.18,.97,0],hipR:[.38,.97,0],shL:[.3,1.44,0],belt:[.12,1.0,-.02,1.45,1.05],halo:2.04,spine:[.06,1.55,-.27]}};
-let charId=GN.store.get('char','outlaw');if(!GN.chars.get(charId))charId=GN.chars.first();
-let A=CHARS[charId]||CHARS.outlaw;
-GN.chars.on(()=>{if(!GN.chars.get(charId)&&GN.loChar)GN.loChar(GN.chars.first());});
+let charId=null,want=(GN.hero&&GN.hero.active()&&GN.hero.active().model)||GN.store.get('char','outlaw'),loadErr=false;
+GN.chars.on(()=>{if(want&&want!==charId&&GN.chars.exists(want))GN.loChar(want);});
 let model=null;
 /* ---------- kamera ---------- */
 let yaw=0,tYaw=0,pitch=.12,dist=5.2,tDist=5.2,lookY=.95,tLookY=.95,spin=true;
@@ -78,10 +77,20 @@ function load(){
   GN.chars.buffer(id).then(GN.chars.parse).then(sc=>{
     if(CHARS[id])anc[id]=CHARS[id];else{GN.chars.normalise(sc);const w=new THREE.Group();w.add(sc);anc[id]=GN.chars.anchors(w);sc=w;}
     scenes[id]=sc;use(sc);
-  }).catch(()=>{const l=$('#lo-load');if(l){l.hidden=false;l.textContent='This character could not be loaded.';}});
+  }).catch(err=>{if(id!==charId)return;loadErr=true;msg(`This miniature could not be loaded${err&&err.message?': '+GN.esc(String(err.message).slice(0,120)):''}.`,true);});
+  setTimeout(()=>{if(id===charId&&!scenes[id]&&!loadErr){const l=$('#lo-load');if(l&&!l.hidden)l.textContent='Still loading… big models take longer on phones.';}},15000);
 }
-GN.loChar=id=>{if(!GN.chars.get(id)||id===charId)return;charId=id;GN.store.set('char',id);load();};
-load();
+function msg(t,retry){const l=$('#lo-load');if(!l)return;l.hidden=false;l.innerHTML=`<div>${t}</div><div class="row" style="justify-content:center;margin-top:10px">${retry?'<button id="lo-retry">Try again</button>':''}<button class="b-gold" id="lo-pick">Choose a miniature</button></div>`;
+  const r=l.querySelector('#lo-retry');if(r)r.onclick=()=>{loadErr=false;delete scenes[charId];l.textContent='Loading miniature…';load();};
+  l.querySelector('#lo-pick').onclick=pickMini;}
+function pickMini(){const h=GN.hero.active();GN.modal(`<h2 id="md-t" class="cond" style="color:var(--gold)">Miniature for ${GN.esc(h.name)}</h2><div class="col" style="gap:6px;max-height:50vh;overflow:auto">${GN.chars.list().map(m=>`<button data-pm="${GN.esc(m.id)}" class="${m.id===h.model?'on-t':''}" style="justify-content:flex-start">${GN.esc(m.name)}${m.builtin?'':' ★'}</button>`).join('')}</div><label class="btn filebtn b-out">Upload a .glb<input id="pm-up" type="file" accept=".glb,model/gltf-binary"></label><p class="sub" id="pm-err" style="margin:0;color:var(--magl)"></p><button data-close>Cancel</button>`,(c,close)=>{
+  c.addEventListener('click',e=>{const b=e.target.closest('[data-pm]');if(!b)return;h.model=b.dataset.pm;GN.hero.save();close();loadErr=false;charId=null;GN.loChar(h.model);GN.toast('Miniature changed.');});
+  c.querySelector('#pm-up').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const r=await GN.chars.add(f,f.name.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').slice(0,32),h.cls);h.model=r.id;GN.hero.save();close();charId=null;GN.loChar(r.id);GN.toast('Miniature uploaded.');}catch(err){c.querySelector('#pm-err').textContent=err.message;}});});}
+GN.loChar=id=>{want=id;if(id===charId&&!loadErr)return;const l=$('#lo-load');if(l&&!scenes[id]){l.hidden=false;l.textContent='Loading miniature…';}
+  GN.chars.ready.then(()=>{if(want!==id)return;
+    if(!GN.chars.exists(id)){charId=null;if(model){rig.remove(model);model=null;}msg('This character\'s miniature is no longer on this device (uploads stay only in the browser where you added them).',false);return;}
+    if(id===charId&&!loadErr)return;charId=id;loadErr=false;GN.store.set('char',id);load();});};
+GN.loChar(want);
 let t0=performance.now();
 function loop(t){
   const dt=Math.min(.05,(t-t0)/1000);t0=t;
@@ -112,7 +121,7 @@ function uploadDialog(){
     f.addEventListener('change',()=>{file=f.files[0]||null;c.querySelector('#up-n').textContent=file?`${file.name} · ${(file.size/1e6).toFixed(1)} MB`:'No file chosen';if(file&&!c.querySelector('#up-name').value)c.querySelector('#up-name').value=file.name.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').slice(0,32);ok.disabled=!file;});
     ok.addEventListener('click',async()=>{ok.disabled=true;ok.textContent='Adding…';c.querySelector('#up-err').textContent='';
       try{const r=await GN.chars.add(file,c.querySelector('#up-name').value.trim(),c.querySelector('#up-cls').value);
-        close();GN.store.set('char',r.id);renderChars();if(GN.loChar)GN.loChar(r.id);
+        close();renderChars();
         GN.toast(r.saved?'Character added and saved on this device.':'Character added for this visit (this browser blocks saving).');
         if(file.size>15e6)setTimeout(()=>GN.toast('Heavy model: it may be slow on phones. Aim for under 60k triangles.'),3000);
       }catch(err){c.querySelector('#up-err').textContent=err.message||'Upload failed.';ok.disabled=false;ok.textContent='Add character';}});
@@ -129,7 +138,7 @@ function manage(){
       const yes=m.querySelector('#mg-yes');if(yes&&yes.dataset.id===c.id){return;}
       b.outerHTML=`<span style="display:flex;gap:6px"><button data-no style="min-height:40px">Keep</button><button class="b-gold" id="mg-yes" data-id="${GN.esc(c.id)}" style="min-height:40px">${c.builtin?'Hide':'Delete'}</button></span>`;
       m.querySelector('[data-no]').addEventListener('click',()=>{close();manage();});
-      m.querySelector('#mg-yes').addEventListener('click',async()=>{try{await GN.chars.remove(c.id);close();renderChars();if(GN.loChar)GN.loChar(GN.store.get('char',GN.chars.first()));GN.toast(c.builtin?`${c.name} hidden. Restore it any time.`:`${c.name} deleted.`);manage();}catch(err){GN.toast(err.message);}});}));
+      m.querySelector('#mg-yes').addEventListener('click',async()=>{try{await GN.chars.remove(c.id);close();renderChars();if(GN.loChar&&GN.hero)GN.loChar(GN.hero.active().model);GN.toast(c.builtin?`${c.name} hidden. Restore it any time.`:`${c.name} deleted.`);manage();}catch(err){GN.toast(err.message);}});}));
     const r=m.querySelector('#mg-restore');if(r)r.addEventListener('click',()=>{GN.chars.restore();close();renderChars();GN.toast('Built-in miniatures restored.');manage();});
   });
 }

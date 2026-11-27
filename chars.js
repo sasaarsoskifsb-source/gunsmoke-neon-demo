@@ -9,7 +9,9 @@ const MAXMB=40;let custom=[];const subs=[];
 let dbp=null;const mem={};
 function db(){if(dbp)return dbp;dbp=new Promise((res)=>{try{const r=indexedDB.open('gn-chars',1);r.onupgradeneeded=()=>r.result.createObjectStore('chars',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);}catch(e){res(null);}});return dbp;}
 function tx(mode,fn){return db().then(d=>new Promise(res=>{if(!d){res(null);return;}try{const t=d.transaction('chars',mode),s=t.objectStore('chars');const q=fn(s);t.oncomplete=()=>res(q&&q.result);t.onerror=()=>res(null);}catch(e){res(null);}}));}
-async function loadList(){const all=await tx('readonly',s=>s.getAll());custom=(all||[]).map(c=>({id:c.id,name:c.name,cls:c.cls,builtin:false,size:c.size}));emit();}
+let readyRes;const ready=new Promise(r=>readyRes=r);
+async function loadList(){const all=await tx('readonly',s=>s.getAll());const keep=custom.filter(c=>mem[c.id]&&!(all||[]).some(a=>a.id===c.id));custom=(all||[]).map(c=>({id:c.id,name:c.name,cls:c.cls,builtin:false,size:c.size})).concat(keep);readyRes();emit();}
+setTimeout(()=>readyRes(),4000);
 function emit(){subs.forEach(f=>{try{f();}catch(e){}});}
 function b64ToBuf(b64){const bin=atob(b64),n=bin.length,u=new Uint8Array(n);for(let i=0;i<n;i++)u[i]=bin.charCodeAt(i);return u.buffer;}
 function embed(id){return new Promise((res,rej)=>{if(window.GN_EMBED&&GN_EMBED[id]){res(b64ToBuf(GN_EMBED[id]));return;}
@@ -74,6 +76,6 @@ function anchors(root){
     hipL:[hl,.51*H,wz],hipR:[hr,.51*H,wz],shL:[q(sh,0,.85),.755*H,q(sh,2,.5)],belt:[wx,.525*H,wz,Math.max(.8,wrx/.2),Math.max(.8,wrz/.2)],halo:1.07*H,spine:[hx,.82*H,q(back,2,.06)]};
 }
 function parse(buf){return new Promise((res,rej)=>new THREE.GLTFLoader().parse(buf.slice(0),'',g=>res(g.scene),rej));}
-GN.chars={list,get,first,add,remove,restore,hiddenCount:()=>hidden().length,buffer,parse,normalise,anchors,on(f){subs.push(f);},MAXMB};
+GN.chars={ready,exists:id=>BUILTIN.some(c=>c.id===id)||custom.some(c=>c.id===id)||!!mem[id],list,get,first,add,remove,restore,hiddenCount:()=>hidden().length,buffer,parse,normalise,anchors,on(f){subs.push(f);},MAXMB};
 loadList();
 })();
