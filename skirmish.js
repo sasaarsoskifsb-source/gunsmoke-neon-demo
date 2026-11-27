@@ -159,7 +159,7 @@ async function defend(a,t,hits,p,cv,L){
   return thr;
 }
 /* ---------- items & interactions ---------- */
-const ITEM={nanoheal:'Nano Heal: +3 HP',stim:'Stim Shot: +2 movement',granate:'Granate: throw up to 3 hexes',smoke:'Smoke Grenade: heavy cover on 3 hexes',flash:'Flashbang: foes within 1 hex lose reaction',empnade:'EMP Grenade: foes within 1 hex lose reaction and cyberware',knives:'Throwing Knife: 1D6, range 1–3',patch:'Armor Patch: kept for a reaction',spike:'Hack Spike: capture a flag from 1 hex'};
+const ITEM={nanoheal:'Nano Heal: +3 HP',stim:'Stim Shot: +2 movement',granate:'Granate: throw up to 3 hexes',smoke:'Smoke Grenade: heavy cover on 3 hexes',flash:'Flashbang: everyone within 1 hex of the target loses reaction',empnade:'EMP Grenade: cyberware within 1 hex of the target shuts down',knives:'Throwing Knife: 1D6, range 1–3',patch:'Armor Patch: kept for a reaction',spike:'Hack Spike: capture a flag from 1 hex'};
 /* ---------- turns ---------- */
 async function startRound(){
   M.round++;M.rd={};M.smoke.clear();
@@ -226,7 +226,6 @@ ui.acts.addEventListener('click',async e=>{
   if(m==='item'){const it=await ask('Use which item from your pack?',u.pack.filter((x,i,a)=>a.indexOf(x)===i&&x!=='patch').map(x=>({l:ITEM[x],v:x,cls:'b-out'})).concat([{l:'Cancel',v:null}]));if(!it)return;
     if(it==='nanoheal'){u.pack.splice(u.pack.indexOf(it),1);const hv=Math.min(u.max-u.hp,3+((u.tal||[]).includes('patch')?2:0));u.hp+=hv;u.acted=true;feed(`<b>${esc(u.name)}</b> uses Nano Heal: +${hv} HP.`);}
     else if(it==='stim'){u.pack.splice(u.pack.indexOf(it),1);u.bonusMv=2;feed(`<b>${esc(u.name)}</b> injects a Stim Shot: +2 movement.`);if(!u.moved){M.mode='move';}}
-    else if(it==='flash'||it==='empnade'){u.pack.splice(u.pack.indexOf(it),1);u.acted=true;const tg=foes(u).filter(t=>t.st==='ok'&&dist(T(u),T(t))<=4);tg.forEach(t=>{t.react=false;if(it==='empnade'){t.reflexDie=false;t.plasma=false;}});feed(`<b>${esc(u.name)}</b> throws a ${it==='flash'?'Flashbang':'EMP Grenade'}: ${tg.length?tg.map(t=>esc(t.name)).join(', ')+' lose their reaction':'no one caught'}.`);}
     else if(it==='spike'){toast('Hack Spike: stand next to a flag and use Interact.');return;}
     else{M.mode='throw:'+it;selectMode();toast('Tap a highlighted hex to throw.');}
     renderUnits();renderActs();autoEnd();return;}
@@ -246,6 +245,7 @@ async function onTap(p){
   if(mode==='exec'){const t=unitAt(k);t.st='dead';u.acted=true;u.downs++;feed(`<b>${esc(u.name)}</b> executes <b>${esc(t.name)}</b>. Permadeath: 3 days.`);place();renderUnits();if(!checkEnd())autoEnd();return true;}
   if(mode&&mode.startsWith('throw:')){const it=mode.slice(6);u.pack.splice(u.pack.indexOf(it),1);u.acted=true;const L=[];
     if(it==='smoke'){M.smoke.add(k);const h=M.H.get(k);for(const[dq,dr]of DIRS){const n=K(h.q+dq,h.r+dr);if(M.H.has(n))M.smoke.add(n);}feed(`<b>${esc(u.name)}</b> throws smoke: heavy cover until the end of the round.`);}
+    if(it==='flash'||it==='empnade'){const h=M.H.get(k),tg=M.U.filter(x=>x!==u&&x.st==='ok'&&dist(T(x),h)<=1);tg.forEach(t=>{t.react=false;if(it==='empnade'){t.reflexDie=false;t.plasma=false;t.decoy=false;t.sub=false;t.camo=false;}});feed(`<b>${esc(u.name)}</b> throws ${it==='flash'?'a Flashbang: '+(tg.length?tg.map(t=>esc(t.name)).join(', ')+' lose their reaction this round':'no one caught'):'an EMP Grenade: '+(tg.length?tg.map(t=>esc(t.name)).join(', ')+' lose reaction and cyberware':'no one caught')}.`);}
     if(it==='granate'){const h=M.H.get(k),tg=M.U.filter(x=>x.st==='ok'&&dist(T(x),h)<=1);L.push(`<b>${esc(u.name)}</b> throws a Granate.`);for(const x of tg){const v=d6();L.push(`${esc(x.name)}: ${pips([v],4)}${hit(v,4)?' −1 HP':''}`);if(hit(v,4))damage(x,1,u,L);}feed(L.join('<br>'));}
     if(it==='knives'){const t=unitAt(k);L.push(`<b>${esc(u.name)}</b> throws a knife at ${esc(t.name)}.`);const v=(await rollFor(u,1,4,'Throwing Knife'))[0];L.push(`${pips([v],4)}`);if(hit(v,4)){const th=await defend(u,t,1,{dmg:1,fire:0},cover(u,t),L);if(th){L.push(`${esc(t.name)} −1 HP`);damage(t,1,u,L);}}feed(L.join('<br>'));}
     place();renderUnits();if(!checkEnd())autoEnd();return true;}
